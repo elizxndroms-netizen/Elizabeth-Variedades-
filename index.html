@@ -393,25 +393,34 @@
         let currentSubcategory = 'todos';
 
         // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
-        async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec"; // Pega aquí la URL de tu Apps Script
-            
-            if (!sheetAPIUrl || sheetAPIUrl.includes("PEGA_AQUÍ")) {
-                document.getElementById('product-grid').innerHTML = `
-                    <div class="col-span-full text-center py-12 text-red-500 bg-red-50 rounded-2xl border border-red-200 p-4">
-                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
-                        <p class="font-bold">Falta configurar la URL de tu API de Google Sheets.</p>
-                    </div>`;
-                return;
+       // FUNCIÓN PARA CONVERTIR ENLACES DE GOOGLE DRIVE EN FOTOS DIRECTAS
+        function fixDriveImageUrl(url) {
+            if (!url) return '';
+            if (url.includes('drive.google.com')) {
+                // Extrae el ID del archivo de Google Drive
+                const match = url.match(/[-\w]{25,}/);
+                if (match) {
+                    return `https://lh3.googleusercontent.com/d/${match[0]}`;
+                }
             }
+            return url;
+        }
 
+        // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
+        async function loadProductsFromSheet() {
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec"; // Tu URL de Apps Script
+            
             try {
                 const response = await fetch(sheetAPIUrl);
                 const data = await response.json();
 
                 products = data.map((row, index) => {
-                    const imgReal = row["foto real"] || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
-                    const imgModel = row["foto de referencia"] || "";
+                    const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
+                    const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
+
+                    // Convertir los enlaces de Google Drive en imágenes directas
+                    const imgReal = fixDriveImageUrl(row["foto real"]) || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
+                    const imgModel = fixDriveImageUrl(row["foto de referencia"]) || "";
 
                     let imageArray = [{ url: imgReal, type: "Foto Real" }];
                     if (imgModel) {
@@ -424,8 +433,8 @@
                         category: (row["categoria principal"] || "ropa").toLowerCase().trim(),
                         subcategory: (row["subcategoria"] || "general").toLowerCase().trim(),
                         condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
-                        price: parseFloat(row["precio actual"]) || 0,
-                        oldPrice: parseFloat(row["precio anterior"]) || 0,
+                        price: parseFloat(rawPrice) || 0,
+                        oldPrice: parseFloat(rawOldPrice) || 0,
                         stock: parseInt(row["stock"]) || 1,
                         image: imgReal,
                         images: imageArray,
@@ -439,11 +448,10 @@
                 console.error("Error al cargar Google Sheets:", error);
                 document.getElementById('product-grid').innerHTML = `
                     <div class="col-span-full text-center py-12 text-red-500">
-                        <p>Error al conectar con el catálogo en línea. Verifica el acceso de Apps Script.</p>
+                        <p>Error al conectar con el catálogo en línea.</p>
                     </div>`;
             }
         }
-
         // MOSTRAR MENSAJE TOAST
         function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
             const toast = document.getElementById('toast');
