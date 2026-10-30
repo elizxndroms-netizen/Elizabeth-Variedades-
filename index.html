@@ -404,66 +404,55 @@
             return url;
         }
 
-        // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
-        async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
-            
-            try {
-                const response = await fetch(sheetAPIUrl);
-                const data = await response.json();
+       async function checkoutWhatsApp() {
+          if (cart.length === 0) {
+              alert('Añade al menos un producto al carrito para comprar.');
+              return;
+          }
 
-                products = data.map((row, index) => {
-                    const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
-                    const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
+          const phone = "50238552558";
+          const shippingSelect = document.getElementById('shipping-select');
+          const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+          const shippingCost = parseFloat(shippingSelect.value);
+          const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
 
-                    const imgReal = fixDriveImageUrl(row["foto real"]) || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
-                    const imgModel = fixDriveImageUrl(row["foto de referencia"]) || "";
+          // 1. Enviar la actualización de stock usando una petición de imagen oculta (evita bloqueos de redirección)
+          cart.forEach(item => {
+              const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
+              const img = new Image();
+              img.src = updateUrl; // Ejecuta la orden en Google Sheets al instante y sin bloqueos
+          });
 
-                    let imageArray = [{ url: imgReal, type: "Foto Real" }];
-                    if (imgModel) {
-                        imageArray.push({ url: imgModel, type: "Modelo" });
-                    }
+          // 2. Armar mensaje de WhatsApp
+          let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
+          let subtotal = 0;
 
-                    return {
-                        id: index + 1,
-                        name: row["nombre del producto"] || "Producto sin nombre",
-                        category: (row["categoria principal"] || "ropa").toLowerCase().trim(),
-                        subcategory: (row["subcategoria"] || "general").toLowerCase().trim(),
-                        condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
-                        price: parseFloat(rawPrice) || 0,
-                        oldPrice: parseFloat(rawOldPrice) || 0,
-                        stock: parseInt(row["stock"]) || 1,
-                        image: imgReal,
-                        images: imageArray,
-                        description: row["descripcion"] || "Sin descripción disponible."
-                    };
-                });
+          cart.forEach(i => {
+              const totalItem = i.price * i.qty;
+              subtotal += totalItem;
+              msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+              if (i.image) {
+                  msg += `  📷 *Foto:* ${i.image}\n`;
+              }
+          });
 
-                applyFilters();
-                updateCartUI();
-            } catch (error) {
-                console.error("Error al cargar Google Sheets:", error);
-                document.getElementById('product-grid').innerHTML = `
-                    <div class="col-span-full text-center py-12 text-red-500">
-                        <p>Error al conectar con el catálogo en línea.</p>
-                    </div>`;
-            }
-        }
+          msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
+          msg += `\n*Lugar de Envío:* ${shippingText}`;
+          msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
+          msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
-        // MOSTRAR MENSAJE TOAST
-        function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
+          // 3. Vaciar carrito local y actualizar interfaz
+          cart = [];
+          updateCartUI();
 
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+          // Redirigir a WhatsApp
+          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 2500);
-        }
+          // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
+          setTimeout(() => {
+              loadProductsFromSheet();
+          }, 2000);
+      }
 
         // CALCULAR STOCK DISPONIBLE
         function getAvailableStock(productId) {
