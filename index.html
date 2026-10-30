@@ -394,14 +394,13 @@
 
         // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
         async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbxMFqNorhryYL_g-ykimKAgEv2fWcaqNyN6NTO19emM0CiZAhYR2I5devDvfjdTqOI_/exec"; // <-- PEGA TU URL DE APPS SCRIPT AQUÍ
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbxMFqNorhryYL_g-ykimKAgEv2fWcaqNyN6NTO19emM0CiZAhYR2I5devDvfjdTqOI_/exec"; // Pega aquí la URL de tu Apps Script
             
             if (!sheetAPIUrl || sheetAPIUrl.includes("PEGA_AQUÍ")) {
                 document.getElementById('product-grid').innerHTML = `
                     <div class="col-span-full text-center py-12 text-red-500 bg-red-50 rounded-2xl border border-red-200 p-4">
                         <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
                         <p class="font-bold">Falta configurar la URL de tu API de Google Sheets.</p>
-                        <p class="text-xs text-red-400 mt-1">Coloca el enlace generado en Apps Script dentro de la variable 'sheetAPIUrl'.</p>
                     </div>`;
                 return;
             }
@@ -411,8 +410,8 @@
                 const data = await response.json();
 
                 products = data.map((row, index) => {
-                    const imgReal = row["url de foto real"] || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
-                    const imgModel = row["url de foto modelo"] || "";
+                    const imgReal = row["foto real"] || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
+                    const imgModel = row["foto de referencia"] || "";
 
                     let imageArray = [{ url: imgReal, type: "Foto Real" }];
                     if (imgModel) {
@@ -427,7 +426,7 @@
                         condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
                         price: parseFloat(row["precio actual"]) || 0,
                         oldPrice: parseFloat(row["precio anterior"]) || 0,
-                        stock: parseInt(row["stock / existencia"]) || 1,
+                        stock: parseInt(row["stock"]) || 1,
                         image: imgReal,
                         images: imageArray,
                         description: row["descripcion"] || "Sin descripción disponible."
