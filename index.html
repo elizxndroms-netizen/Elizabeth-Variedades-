@@ -406,7 +406,7 @@
 
         // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
         async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec";
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
             
             try {
                 const response = await fetch(sheetAPIUrl);
@@ -810,7 +810,7 @@
             const shippingSelect = document.getElementById('shipping-select');
             const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
             const shippingCost = parseFloat(shippingSelect.value);
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec";
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
 
             // 1. Preparar lista de productos a actualizar
             const itemsToUpdate = cart.map(i => ({ name: i.name, qty: i.qty }));
