@@ -802,7 +802,7 @@
             document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
         }
 
-        function checkoutWhatsApp() {
+        async function checkoutWhatsApp() {
             if (cart.length === 0) {
                 alert('Añade al menos un producto al carrito para comprar.');
                 return;
@@ -813,6 +813,22 @@
             const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
             const shippingCost = parseFloat(shippingSelect.value);
 
+            // 1. Descontar el stock en Google Sheets
+            const itemsToUpdate = cart.map(i => ({ name: i.name, qty: i.qty }));
+            
+            try {
+                // Enviar petición POST para restar existencias en la hoja de cálculo
+                fetch("PEGA_AQUÍ_TU_URL_DE_APPS_SCRIPT", {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(itemsToUpdate)
+                });
+            } catch (err) {
+                console.error("Error actualizando stock:", err);
+            }
+
+            // 2. Armar mensaje de WhatsApp
             let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
             let subtotal = 0;
 
@@ -830,7 +846,17 @@
             msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
             msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
+            // 3. Vaciar el carrito local y recargar productos
+            cart = [];
+            updateCartUI();
+
+            // Redirigir a WhatsApp
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+            // Recargar el catálogo después de 1 segundo para mostrar las nuevas existencias
+            setTimeout(() => {
+                loadProductsFromSheet();
+            }, 1000);
         }
 
         // NAVEGACIÓN Y MODALES
