@@ -800,62 +800,58 @@
             document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
         }
 
-        async function checkoutWhatsApp() {
-            if (cart.length === 0) {
-                alert('Añade al menos un producto al carrito para comprar.');
-                return;
-            }
+      async function checkoutWhatsApp() {
+    if (cart.length === 0) {
+        alert('Añade al menos un producto al carrito para comprar.');
+        return;
+    }
 
-            const phone = "50238552558";
-            const shippingSelect = document.getElementById('shipping-select');
-            const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
-            const shippingCost = parseFloat(shippingSelect.value);
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
+    const phone = "50238552558";
+    const shippingSelect = document.getElementById('shipping-select');
+    const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+    const shippingCost = parseFloat(shippingSelect.value);
+    const baseUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec";
 
-            // 1. Preparar lista de productos a actualizar
-            const itemsToUpdate = cart.map(i => ({ name: i.name, qty: i.qty }));
-
-            // 2. Enviar petición POST usando text/plain para evitar bloqueos CORS
-            try {
-                await fetch(sheetAPIUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(itemsToUpdate)
-                });
-            } catch (err) {
-                console.error("Error enviando actualización de stock:", err);
-            }
-
-            // 3. Armar mensaje de WhatsApp
-            let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
-            let subtotal = 0;
-
-            cart.forEach(i => {
-                const totalItem = i.price * i.qty;
-                subtotal += totalItem;
-                msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
-                if (i.image) {
-                    msg += `  📷 *Foto:* ${i.image}\n`;
-                }
-            });
-
-            msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
-            msg += `\n*Lugar de Envío:* ${shippingText}`;
-            msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
-            msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
-
-            // 4. Vaciar carrito local y actualizar interfaz
-            cart = [];
-            updateCartUI();
-
-            // Redirigir a WhatsApp
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-
-            // Recargar productos después de 2 segundos para mostrar las nuevas existencias
-            setTimeout(() => {
-                loadProductsFromSheet();
-            }, 2000);
+    // 1. Enviar la actualización de stock usando peticiones GET (evita bloqueos de seguridad)
+    for (const item of cart) {
+        try {
+            const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
+            await fetch(updateUrl, { mode: 'no-cors' });
+        } catch (err) {
+            console.error("Error actualizando stock:", err);
         }
+    }
+
+    // 2. Armar mensaje de WhatsApp
+    let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
+    let subtotal = 0;
+
+    cart.forEach(i => {
+        const totalItem = i.price * i.qty;
+        subtotal += totalItem;
+        msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+        if (i.image) {
+            msg += `  📷 *Foto:* ${i.image}\n`;
+        }
+    });
+
+    msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
+    msg += `\n*Lugar de Envío:* ${shippingText}`;
+    msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
+    msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
+
+    // 3. Vaciar carrito local y actualizar interfaz
+    cart = [];
+    updateCartUI();
+
+    // Redirigir a WhatsApp
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
+    setTimeout(() => {
+        loadProductsFromSheet();
+    }, 2000);
+}
 
         // NAVEGACIÓN Y MODALES
         function toggleSidebar() {
