@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variedades Elizabeth | Catálogo Online</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            pink: '#ec4899',
+                            purple: '#8b5cf6',
+                            dark: '#1f2937',
+                            light: '#f9fafb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .zoom-container {
+            overflow: hidden;
+            position: relative;
+            cursor: zoom-in;
+        }
+        .zoom-container img {
+            transition: transform 0.3s ease;
+        }
+        .zoom-container:hover img {
+            transform: scale(1.8);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- TOAST DE NOTIFICACIÓN -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <div>
+            <p class="font-bold text-sm" id="toast-title">¡Se ha agregado a tu pedido!</p>
+            <p class="text-xs text-emerald-100" id="toast-msg">Revisa tu carrito para ver los detalles.</p>
+        </div>
+    </div>
+
+    <!-- BANNER SUPERIOR -->
+    <header class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="text-2xl focus:outline-none p-1 rounded hover:bg-white/20 transition">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Variedades Elizabeth</h1>
+                    <p class="text-xs text-pink-100 font-light">ropa, zapatos, accesorios y mas..</p>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DERECHO: CARRITO + VERSÍCULO BÍBLICO -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleCart()" class="relative p-2 rounded-full hover:bg-white/20 transition">
+                    <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">0</span>
+                </button>
+
+                <!-- VERSÍCULO BÍBLICO A LA DERECHA DEL CARRITO -->
+                <div class="hidden sm:block text-right border-l border-white/20 pl-3">
+                    <p class="text-[11px] text-yellow-200 italic font-medium leading-tight max-w-[200px]">
+                        <i class="fa-solid fa-book-bible mr-1"></i> "Todo lo que hagáis, hacedlo de corazón"
+                    </p>
+                    <span class="text-[10px] text-pink-100 font-semibold block">Colosenses 3:23</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENÚ LATERAL (SIDEBAR) -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 w-80 h-full bg-white z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
+        <div class="p-5">
+            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-store mr-2 text-pink-500"></i>Menú</h2>
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-800 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <nav class="space-y-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Navegación</p>
+                <button onclick="filterCategory('todos'); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center">
+                    <i class="fa-solid fa-border-all w-8"></i> Todos los productos
+                </button>
+                <button onclick="filterCategory('ofertas'); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center text-red-600 font-medium">
+                    <i class="fa-solid fa-tag w-8"></i> Ofertas Especiales!!!
+                </button>
+                <button onclick="openHowToBuyModal(); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center text-pink-600 font-semibold">
+                    <i class="fa-solid fa-circle-question w-8"></i> ¿Cómo comprar?
+                </button>
+                <button onclick="openAboutModal(); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center">
+                    <i class="fa-solid fa-users w-8"></i> ¿Quiénes somos?
+                </button>
+
+                <div class="border-t pt-4 mt-4">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Nuestras Tiendas</p>
+                    <a href="https://www.facebook.com/kali.pastel.2025?sfnsn=wa&mibextid=RUbZ1f" target="_blank" class="w-full bg-gradient-to-r from-amber-400 to-amber-600 text-white font-bold px-4 py-3 rounded-xl shadow hover:opacity-90 transition flex items-center justify-between">
+                        <span><i class="fa-solid fa-cake-candles mr-2"></i> Kali Pastel</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="p-5 border-t bg-gray-50 text-xs text-gray-500 text-center">
+            <p>Variedades Elizabeth &copy; 2026</p>
+            <p>San Juan Sacatepéquez, Guatemala</p>
+        </div>
+    </aside>
+
+    <!-- BARRA PRINCIPAL DE CATEGORÍAS -->
+    <div class="bg-white shadow-sm border-b sticky top-[68px] z-20">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar">
+            <button onclick="filterCategory('todos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm">Todos</button>
+            <button onclick="filterCategory('ropa')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Ropa</button>
+            <button onclick="filterCategory('zapatos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Zapatos</button>
+            <button onclick="filterCategory('accesorios')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Accesorios</button>
+            <button onclick="filterCategory('consolas_telefonos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Consolas & Teléfonos</button>
+        </div>
+
+        <!-- BARRA SECUNDARIA DE SUBCATEGORÍAS CON ÍCONOS -->
+        <div id="subcategory-container" class="bg-pink-50/70 border-t border-pink-100 py-2 hidden">
+            <div id="subcategory-list" class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto no-scrollbar">
+                <!-- Se insertan dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN ILUSTRADA: ¿CÓMO COMPRAR? -->
+    <section class="bg-gradient-to-b from-pink-50 to-white py-8 border-b">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold uppercase tracking-widest text-pink-600 bg-pink-100 px-3 py-1 rounded-full">Guía de Compra</span>
+                <h2 class="text-2xl font-extrabold text-gray-800 mt-2">¿Cómo Comprar en Variedades Elizabeth?</h2>
+                <p class="text-xs text-gray-500 mt-1">Sigue estos 4 sencillos pasos para hacer tu pedido</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <!-- Paso 1 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
+                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">1</div>
+                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <h3 class="font-bold text-sm text-gray-800 mb-1">Explora</h3>
+                    <p class="text-xs text-gray-500">Elige ropa, zapatos o accesorios y toca cualquier tarjeta para ver detalles y fotos reales.</p>
+                </div>
+                <!-- Paso 2 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
+                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">2</div>
+                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-cart-plus"></i></div>
+                    <h3 class="font-bold text-sm text-gray-800 mb-1">Agrega al Carrito</h3>
+                    <p class="text-xs text-gray-500">Revisa las existencias disponibles y presiona <b>"Agregar"</b> en tus favoritos.</p>
+                </div>
+                <!-- Paso 3 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
+                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">3</div>
+                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-truck-fast"></i></div>
+                    <h3 class="font-bold text-sm text-gray-800 mb-1">Selecciona Envío</h3>
+                    <p class="text-xs text-gray-500">Abre tu carrito y elige tu zona (Parque San Juan es <b>GRATIS</b>).</p>
+                </div>
+                <!-- Paso 4 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
+                    <div class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">4</div>
+                    <div class="text-green-600 text-xl mb-2"><i class="fa-brands fa-whatsapp"></i></div>
+                    <h3 class="font-bold text-sm text-gray-800 mb-1">Pide por WhatsApp</h3>
+                    <p class="text-xs text-gray-500">Toca el botón verde para enviar tu pedido y coordinar la entrega.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GRILLA DE PRODUCTOS -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Productos cargados con JS -->
+        </div>
+    </main>
+
+    <!-- MODAL DETALLE DE PRODUCTO CON CARRUSEL Y ETIQUETAS DE TIPO DE FOTO -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]">
+            <button onclick="closeProductModal()" class="absolute top-3 right-3 bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center z-20 shadow"><i class="fa-solid fa-xmark"></i></button>
+            
+            <!-- VISTA DE IMÁGENES Y GALERÍA -->
+            <div class="md:w-1/2 bg-gray-100 p-4 flex flex-col items-center justify-between overflow-y-auto">
+                <div class="relative w-full flex-grow flex items-center justify-center bg-white rounded-xl shadow-inner p-2 min-h-[220px]">
+                    <span id="modal-image-tag" class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10"></span>
+                    <div class="zoom-container rounded-lg overflow-hidden w-full flex items-center justify-center">
+                        <img id="modal-img" src="" alt="" class="object-contain max-h-64 w-full">
+                    </div>
+                </div>
+
+                <!-- GALERÍA DE MINIATURAS CON ETIQUETAS -->
+                <div id="modal-thumbnails" class="flex space-x-2 overflow-x-auto w-full pt-3 pb-1 justify-start no-scrollbar">
+                    <!-- Insertados con JS -->
+                </div>
+            </div>
+
+            <!-- DETALLES Y BOTÓN DE COMPRA -->
+            <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span id="modal-badge-condition" class="text-xs px-2 py-0.5 rounded-full font-semibold"></span>
+                        <span id="modal-badge-category" class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold uppercase"></span>
+                    </div>
+                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-1"></h3>
+                    <p id="modal-stock" class="text-xs font-bold text-gray-500 mb-2"></p>
+                    <p id="modal-price" class="text-3xl font-extrabold text-pink-600 mb-3"></p>
+                    <p id="modal-desc" class="text-gray-600 text-sm mb-6 leading-relaxed"></p>
+                </div>
+
+                <button id="modal-add-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    <span id="modal-btn-text">Agregar al Carrito</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GUÍA CÓMO COMPRAR -->
+    <div id="how-to-buy-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeHowToBuyModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">¿Cómo realizar tu pedido?</h3>
+                <p class="text-xs text-gray-500">Guía rápida de Variedades Elizabeth</p>
+            </div>
+
+            <div class="space-y-4 text-xs text-gray-700">
+                <div class="flex items-start space-x-3">
+                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">1</span>
+                    <p><b>Busca tus productos:</b> Explora entre ropa desde Q10, calzado, consolas y accesorios. Toca cualquier producto para ver sus fotos reales y de modelo ampliada.</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">2</span>
+                    <p><b>Añade al Carrito:</b> Presiona <b>"Agregar"</b>. Cada prenda muestra su existencia actual y el sistema se encargará de ocultarla o marcarla como agotada si se terminan.</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">3</span>
+                    <p><b>Elige tu Zona de Envío:</b> Abre tu carrito arriba a la derecha y selecciona tu ubicación (Parque San Juan es gratis, zonas de San Juan Q10, aldeas Q15, San Pedro/Sajcavilla Q20, Capital Q35 y Departamentos Q40).</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">4</span>
+                    <p><b>Envía tu pedido:</b> Toca el botón verde de <b>"Comprar por WhatsApp"</b> para mandar el resumen directo a la encargada y coordinar entrega y pago.</p>
+                </div>
+            </div>
+
+            <button onclick="closeHowToBuyModal()" class="w-full mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl shadow text-xs">Entendido, ¡ir a comprar!</button>
+        </div>
+    </div>
+
+    <!-- MODAL SOBRE NOSOTROS -->
+    <div id="about-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
+            <button onclick="closeAboutModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="w-16 h-16 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-store"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Variedades Elizabeth</h3>
+            <p class="text-gray-600 text-sm mb-4">Tu tienda de confianza con la mejor selección de ropa, zapatos, accesorios, novedades y mucho más en San Juan Sacatepéquez.</p>
+            <p class="text-xs text-gray-400 border-t pt-3">¡Hacemos envíos locales y a todo el país!</p>
+        </div>
+    </div>
+
+    <!-- CARRITO Y CHECKOUT -->
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+        <div class="p-4 bg-pink-600 text-white flex justify-between items-center shadow">
+            <h2 class="text-lg font-bold flex items-center"><i class="fa-solid fa-cart-shopping mr-2"></i> Tu Carrito</h2>
+            <button onclick="toggleCart()" class="hover:bg-pink-700 p-1 rounded-full"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+
+        <div id="cart-items" class="p-4 overflow-y-auto flex-grow space-y-3">
+            <!-- Items del carrito -->
+        </div>
+
+        <div class="p-4 bg-gray-50 border-t space-y-3">
+            <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Selecciona Ubicación de Envío:</label>
+                <select id="shipping-select" onchange="updateCartTotal()" class="w-full text-sm p-2 border rounded-lg bg-white focus:ring-2 focus:ring-pink-500">
+                    <option value="0">Parque de San Juan Sacatepéquez (Gratis)</option>
+                    <option value="10">Zonas de San Juan 1 a 5 (Q10.00)</option>
+                    <option value="15">Aldeas aledañas (Q15.00)</option>
+                    <option value="20">San Pedro Sac. / Sajcavilla (Q20.00)</option>
+                    <option value="35">Ciudad Capital / Alrededores (Q35.00)</option>
+                    <option value="40">Departamentos del país (Q40.00)</option>
+                </select>
+            </div>
+
+            <div class="space-y-1 text-sm border-t pt-2">
+                <div class="flex justify-between text-gray-600"><span>Subtotal:</span><span id="cart-subtotal">Q0.00</span></div>
+                <div class="flex justify-between text-gray-600"><span>Envío:</span><span id="cart-shipping">Q0.00</span></div>
+                <div class="flex justify-between font-extrabold text-lg text-gray-900 border-t pt-1"><span>Total:</span><span id="cart-total" class="text-pink-600">Q0.00</span></div>
+            </div>
+
+            <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span>Comprar por WhatsApp</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-gray-900 text-white mt-12 pt-8 pb-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <h4 class="text-lg font-bold text-pink-400 mb-2">Variedades Elizabeth</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Ropa de buena calidad desde Q10, consolas, accesorios, calzado y mucho más.</p>
+                <button onclick="openHowToBuyModal()" class="mt-3 text-xs text-pink-400 hover:underline flex items-center"><i class="fa-solid fa-circle-question mr-1"></i> Ver guía de cómo comprar</button>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-200 mb-2">Tarifas de Envío</h4>
+                <ul class="text-xs text-gray-400 space-y-1">
+                    <li>• Parque de San Juan: <span class="text-green-400 font-bold">GRATIS</span></li>
+                    <li>• Zonas 1 a 5 de San Juan: <span class="text-white">Q10</span></li>
+                    <li>• Aldeas aledañas: <span class="text-white">Q15</span></li>
+                    <li>• San Pedro / Sajcavilla: <span class="text-white">Q20</span></li>
+                    <li>• Capital: <span class="text-white">Q35</span> | Departamentos: <span class="text-white">Q40</span></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-200 mb-2">Redes Sociales</h4>
+                <div class="flex space-x-4">
+                    <a href="https://www.facebook.com/share/1DA4FRRLuL/" target="_blank" class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="w-9 h-9 bg-pink-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@elizabeth.varieda05?_r=1&_t=ZS-9AwokNILJuW" target="_blank" class="w-9 h-9 bg-black border border-gray-700 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-xs text-gray-500 border-t border-gray-800 pt-4">
+            &copy; 2026 Variedades Elizabeth.
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE JAVASCRIPT -->
+    <script>
+        // CONFIGURACIÓN DE SUBCATEGORÍAS CON ÍCONOS
+        const subcategoryConfig = {
+            ropa: [
+                { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
+                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
+                { id: 'bebes', label: 'Bebés', icon: 'fa-solid fa-baby' },
+                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
+                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' },
+                { id: 'juvenil', label: 'Juvenil', icon: 'fa-solid fa-graduation-cap' },
+                { id: 'ropa_interior', label: 'Ropa Interior', icon: 'fa-solid fa-socks' }
+            ],
+            zapatos: [
+                { id: 'todos_zapatos', label: 'Todo Zapatos', icon: 'fa-solid fa-shoe-prints' },
+                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
+                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
+                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' }
+            ],
+            accesorios: [
+                { id: 'todos_accesorios', label: 'Todo Accesorios', icon: 'fa-solid fa-icons' },
+                { id: 'herramientas', label: 'Herramientas', icon: 'fa-solid fa-wrench' },
+                { id: 'electricidad', label: 'Electricidad', icon: 'fa-solid fa-bolt' },
+                { id: 'mecanica', label: 'Mecánica', icon: 'fa-solid fa-gears' },
+                { id: 'bolsas_mochilas', label: 'Bolsas y Mochilas', icon: 'fa-solid fa-bag-shopping' },
+                { id: 'tecnologia', label: 'Tecnología', icon: 'fa-solid fa-mobile-screen' },
+                { id: 'belleza', label: 'Belleza', icon: 'fa-solid fa-wand-magic-sparkles' }
+            ]
+        };
+
+        // CATÁLOGO DE PRODUCTOS CON IMÁGENES MÚLTIPLES Y ETIQUETA DE FOTO
+        const products = [
+            {
+                id: 1,
+                name: "Pijama Para Niño S (SPIRIT)",
+                category: "ropa",
+                subcategory: "ninos",
+                condition: "nuevo",
+                price: 113,
+                stock: 2,
+                image: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80", type: "Foto Real" },
+                    { url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=500&q=80", type: "Modelo" },
+                    { url: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=500&q=80", type: "Detalle" }
+                ],
+                description: "Pijama cómoda de Batman Spirit para niño, manga larga con pantalón estampado."
+            },
+            {
+                id: 2,
+                name: "Playera Azul Casual",
+                category: "ropa",
+                subcategory: "caballeros",
+                condition: "usado",
+                price: 10,
+                stock: 1,
+                image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80", type: "Foto Real" },
+                    { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=500&q=80", type: "Modelo" }
+                ],
+                description: "Playera azul de algodón, usada en excelente estado. Talla M. Única pieza disponible."
+            },
+            {
+                id: 3,
+                name: "Blusa Casual Floral",
+                category: "ropa",
+                subcategory: "damas",
+                condition: "usado",
+                price: 10,
+                stock: 1,
+                image: "https://images.unsplash.com/photo-1564257631407-4deb129f0e6f?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1564257631407-4deb129f0e6f?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
+                ],
+                description: "Blusa fresca de segunda mano, talla M, perfecta para uso diario."
+            },
+            {
+                id: 4,
+                name: "Vestido de Noche Elegante",
+                category: "ropa",
+                subcategory: "damas",
+                condition: "nuevo",
+                price: 85,
+                stock: 3,
+                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=500&q=80", type: "Modelo" },
+                    { url: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
+                ],
+                description: "Vestido completamente nuevo con etiqueta, diseño moderno para eventos."
+            },
+            {
+                id: 5,
+                name: "Tenis Deportivos Blancos",
+                category: "zapatos",
+                subcategory: "damas",
+                condition: "nuevo",
+                price: 120,
+                stock: 4,
+                image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
+                ],
+                description: "Calzado deportivo súper cómodo, talla 38. Suela antideslizante."
+            },
+            {
+                id: 6,
+                name: "Consola Portátil Retro GameBoy",
+                category: "consolas_telefonos",
+                subcategory: "tecnologia",
+                condition: "nuevo",
+                price: 110,
+                stock: 2,
+                image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80",
+                images: [
+                    { url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
+                ],
+                description: "Incluye 400 juegos clásicos instalados, batería recargable y cable de conexión a TV."
+            }
+        ];
+
+        let cart = [];
+        let currentCategory = 'todos';
+        let currentSubcategory = 'todos';
+
+        // MOSTRAR MENSAJE TOAST
+        function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // CALCULAR STOCK DISPONIBLE
+        function getAvailableStock(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return 0;
+
+            const cartItem = cart.find(i => i.id === productId);
+            const inCartQty = cartItem ? cartItem.qty : 0;
+            return product.stock - inCartQty;
+        }
+
+        // RENDERIZAR PRODUCTOS
+        function renderProducts(items) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-pink-100 shadow-sm px-4">
+                        <div class="w-16 h-16 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-gray-800">Próximamente</h3>
+                        <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Estamos preparando nuevas prendas y artículos para esta sección. ¡Vuelve pronto a revisar!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(product => {
+                const available = getAvailableStock(product.id);
+                const isOutOfStock = available <= 0;
+                const isNew = product.condition === 'nuevo';
+                const badgeColor = isNew ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col justify-between ${isOutOfStock ? 'opacity-60' : ''}`;
+                
+                card.innerHTML = `
+                    <div onclick="openProductModal(${product.id})" class="cursor-pointer">
+                        <div class="relative h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
+                            <img src="${product.image}" alt="${product.name}" class="object-cover h-full w-full hover:scale-105 transition duration-300">
+                            
+                            <span class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
+                                ${product.condition}
+                            </span>
+
+                            ${isOutOfStock ? `
+                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <span class="bg-red-600 text-white font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Agotado</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-center text-xs mb-1">
+                                <span class="text-gray-400 capitalize">${product.category.replace('_', ' ')}</span>
+                                <span class="font-semibold ${available > 0 ? 'text-blue-600' : 'text-red-500'}">
+                                    ${available > 0 ? `Existencia: ${available}` : 'Agotado'}
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h3>
+                            <p class="text-lg font-extrabold text-pink-600 mt-1">Q${product.price.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    <div class="px-3 pb-3">
+                        <button onclick="addToCart(${product.id})" ${isOutOfStock ? 'disabled' : ''} 
+                            class="w-full ${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-pink-50 hover:bg-pink-100 text-pink-600'} font-semibold py-2 text-xs rounded-lg transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid ${isOutOfStock ? 'fa-ban' : 'fa-cart-plus'}"></i>
+                            <span>${isOutOfStock ? 'Agotado' : 'Agregar'}</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // CONTROL DE FILTRADO Y SUBCATEGORÍAS
+        function filterCategory(category) {
+            currentCategory = category;
+            currentSubcategory = 'todos';
+
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('bg-pink-600', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+
+            if (event && event.target && event.target.classList.contains('cat-btn')) {
+                event.target.classList.remove('bg-gray-100', 'text-gray-600');
+                event.target.classList.add('bg-pink-600', 'text-white');
+            }
+
+            renderSubcategories(category);
+            applyFilters();
+        }
+
+        function renderSubcategories(category) {
+            const container = document.getElementById('subcategory-container');
+            const list = document.getElementById('subcategory-list');
+            list.innerHTML = '';
+
+            if (subcategoryConfig[category]) {
+                container.classList.remove('hidden');
+
+                subcategoryConfig[category].forEach(sub => {
+                    const btn = document.createElement('button');
+                    btn.className = "subcat-btn px-3 py-1 rounded-full text-xs font-semibold bg-white text-pink-700 border border-pink-200 hover:bg-pink-100 whitespace-nowrap transition flex items-center space-x-1.5 shadow-sm";
+                    btn.onclick = (e) => filterSubcategory(sub.id, e);
+                    btn.innerHTML = `<i class="${sub.icon}"></i> <span>${sub.label}</span>`;
+                    list.appendChild(btn);
+                });
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function filterSubcategory(subId, event) {
+            currentSubcategory = subId;
+
+            const btns = document.querySelectorAll('.subcat-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('bg-pink-600', 'text-white');
+                btn.classList.add('bg-white', 'text-pink-700');
+            });
+
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.remove('bg-white', 'text-pink-700');
+                event.currentTarget.classList.add('bg-pink-600', 'text-white');
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = [...products];
+
+            if (currentCategory === 'ofertas') {
+                filtered = filtered.filter(p => p.price <= 20);
+            } else if (currentCategory !== 'todos') {
+                filtered = filtered.filter(p => p.category === currentCategory);
+
+                if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
+                    filtered = filtered.filter(p => p.subcategory === currentSubcategory);
+                }
+            }
+
+            renderProducts(filtered);
+        }
+
+        // CAMBIAR IMAGEN SELECCIONADA EN EL MODAL Y ACTUALIZAR ETIQUETA
+        function selectModalImage(url, type) {
+            document.getElementById('modal-img').src = url;
+
+            const tagEl = document.getElementById('modal-image-tag');
+            tagEl.innerText = type || "Foto";
+            
+            if (type === "Foto Real") {
+                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-emerald-600 text-white";
+            } else if (type === "Modelo") {
+                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-blue-600 text-white";
+            } else {
+                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-gray-800 text-white";
+            }
+
+            // Resaltar miniatura activa
+            const thumbs = document.querySelectorAll('.thumb-btn');
+            thumbs.forEach(tb => tb.classList.remove('border-pink-600', 'ring-2', 'ring-pink-300'));
+            
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('border-pink-600', 'ring-2', 'ring-pink-300');
+            }
+        }
+
+        // MODAL DE PRODUCTO
+        function openProductModal(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            const available = getAvailableStock(p.id);
+            const isOutOfStock = available <= 0;
+
+            const imageList = p.images && p.images.length > 0 ? p.images : [{ url: p.image, type: "Foto Real" }];
+
+            // Cargar primera imagen y su etiqueta
+            selectModalImage(imageList[0].url, imageList[0].type);
+
+            // Cargar miniaturas
+            const thumbContainer = document.getElementById('modal-thumbnails');
+            thumbContainer.innerHTML = '';
+
+            imageList.forEach((imgObj, idx) => {
+                const isReal = imgObj.type === "Foto Real";
+                const badgeBg = isReal ? 'bg-emerald-600' : 'bg-blue-600';
+
+                const btn = document.createElement('button');
+                btn.className = `thumb-btn flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 bg-white relative transition hover:opacity-90 ${idx === 0 ? 'border-pink-600 ring-2 ring-pink-300' : 'border-gray-200'}`;
+                btn.onclick = (e) => selectModalImage(imgObj.url, imgObj.type);
+                btn.innerHTML = `
+                    <img src="${imgObj.url}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-0 inset-x-0 ${badgeBg} text-white text-[8px] font-extrabold text-center py-0.5 truncate uppercase">
+                        ${imgObj.type || 'Foto'}
+                    </span>
+                `;
+                thumbContainer.appendChild(btn);
+            });
+
+            document.getElementById('modal-title').innerText = p.name;
+            document.getElementById('modal-price').innerText = `Q${p.price.toFixed(2)}`;
+            document.getElementById('modal-desc').innerText = p.description;
+            document.getElementById('modal-badge-category').innerText = p.category.replace('_', ' ');
+
+            const stockText = document.getElementById('modal-stock');
+            stockText.innerText = available > 0 ? `Unidades disponibles: ${available}` : '¡Sin existencias!';
+            stockText.className = `text-xs font-bold mb-2 ${available > 0 ? 'text-blue-600' : 'text-red-500'}`;
+
+            const badgeCond = document.getElementById('modal-badge-condition');
+            badgeCond.innerText = p.condition.toUpperCase();
+            badgeCond.className = `text-xs px-2 py-0.5 rounded-full font-semibold ${p.condition.toLowerCase() === 'nuevo' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
+
+            const addBtn = document.getElementById('modal-add-btn');
+            const btnText = document.getElementById('modal-btn-text');
+
+            if (isOutOfStock) {
+                addBtn.disabled = true;
+                btnText.innerText = "Producto Agotado";
+            } else {
+                addBtn.disabled = false;
+                btnText.innerText = "Agregar al Carrito";
+                addBtn.onclick = () => {
+                    addToCart(p.id);
+                    closeProductModal();
+                };
+            }
+
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // CARRITO Y STOCK
+        function addToCart(id) {
+            const available = getAvailableStock(id);
+            if (available <= 0) {
+                alert("Lo sentimos, este producto ya no tiene más existencias disponibles.");
+                return;
+            }
+
+            const p = products.find(prod => prod.id === id);
+            const item = cart.find(i => i.id === id);
+
+            if (item) {
+                item.qty++;
+            } else {
+                cart.push({ ...p, qty: 1 });
+            }
+
+            showToast("¡Se ha agregado a tu pedido!", `${p.name} se añadió correctamente.`);
+            updateCartUI();
+            applyFilters();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+            applyFilters();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                if (delta > 0) {
+                    const available = getAvailableStock(id);
+                    if (available <= 0) {
+                        alert("No hay más existencias disponibles de este producto.");
+                        return;
+                    }
+                }
+
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCartUI();
+                    applyFilters();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((acc, item) => acc + item.qty, 0);
+            document.getElementById('cart-count').innerText = count;
+
+            const cartContainer = document.getElementById('cart-items');
+            cartContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = `<div class="text-center text-gray-400 py-12"><i class="fa-solid fa-basket-shopping text-4xl mb-2"></i><p>Tu carrito está vacío</p></div>`;
+            } else {
+                cart.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between bg-gray-50 p-3 rounded-lg border";
+                    row.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded">
+                            <div>
+                                <h4 class="font-bold text-xs text-gray-800">${item.name}</h4>
+                                <p class="text-xs text-pink-600 font-semibold">Q${item.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold hover:bg-gray-300">-</button>
+                            <span class="text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold hover:bg-gray-300">+</button>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-500 ml-2 hover:text-red-700"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                        </div>
+                    `;
+                    cartContainer.appendChild(row);
+                });
+            }
+
+            updateCartTotal();
+        }
+
+        function updateCartTotal() {
+            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const shipping = parseFloat(document.getElementById('shipping-select').value) || 0;
+            const total = subtotal + shipping;
+
+            document.getElementById('cart-subtotal').innerText = `Q${subtotal.toFixed(2)}`;
+            document.getElementById('cart-shipping').innerText = `Q${shipping.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
+        }
+
+        function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert('Añade al menos un producto al carrito para comprar.');
+                return;
+            }
+
+            const phone = "50238552558";
+            const shippingSelect = document.getElementById('shipping-select');
+            const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+            const shippingCost = parseFloat(shippingSelect.value);
+
+            let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
+            let subtotal = 0;
+
+            cart.forEach(i => {
+                const totalItem = i.price * i.qty;
+                subtotal += totalItem;
+                msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+            });
+
+            msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
+            msg += `\n*Lugar de Envío:* ${shippingText}`;
+            msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
+            msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
+
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // NAVEGACIÓN Y MODALES
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-drawer').classList.toggle('translate-x-full');
+        }
+
+        function openAboutModal() {
+            document.getElementById('about-modal').classList.remove('hidden');
+        }
+
+        function closeAboutModal() {
+            document.getElementById('about-modal').classList.add('hidden');
+        }
+
+        function openHowToBuyModal() {
+            document.getElementById('how-to-buy-modal').classList.remove('hidden');
+        }
+
+        function closeHowToBuyModal() {
+            document.getElementById('how-to-buy-modal').classList.add('hidden');
+        }
+
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
