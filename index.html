@@ -392,12 +392,10 @@
         let currentCategory = 'todos';
         let currentSubcategory = 'todos';
 
-        // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
-       // FUNCIÓN PARA CONVERTIR ENLACES DE GOOGLE DRIVE EN FOTOS DIRECTAS
+        // FUNCIÓN PARA CONVERTIR ENLACES DE GOOGLE DRIVE EN FOTOS DIRECTAS
         function fixDriveImageUrl(url) {
             if (!url) return '';
             if (url.includes('drive.google.com')) {
-                // Extrae el ID del archivo de Google Drive
                 const match = url.match(/[-\w]{25,}/);
                 if (match) {
                     return `https://lh3.googleusercontent.com/d/${match[0]}`;
@@ -408,7 +406,7 @@
 
         // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
         async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec"; // Tu URL de Apps Script
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec";
             
             try {
                 const response = await fetch(sheetAPIUrl);
@@ -418,7 +416,6 @@
                     const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
                     const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
 
-                    // Convertir los enlaces de Google Drive en imágenes directas
                     const imgReal = fixDriveImageUrl(row["foto real"]) || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
                     const imgModel = fixDriveImageUrl(row["foto de referencia"]) || "";
 
@@ -452,6 +449,7 @@
                     </div>`;
             }
         }
+
         // MOSTRAR MENSAJE TOAST
         function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
             const toast = document.getElementById('toast');
@@ -477,7 +475,7 @@
             return product.stock - inCartQty;
         }
 
-        // RENDERIZAR PRODUCTOS (Oculta si stock <= 0)
+        // RENDERIZAR PRODUCTOS
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -812,23 +810,23 @@
             const shippingSelect = document.getElementById('shipping-select');
             const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
             const shippingCost = parseFloat(shippingSelect.value);
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec";
 
-            // 1. Descontar el stock en Google Sheets
+            // 1. Preparar lista de productos a actualizar
             const itemsToUpdate = cart.map(i => ({ name: i.name, qty: i.qty }));
-            
+
+            // 2. Enviar petición POST usando text/plain para evitar bloqueos CORS
             try {
-                // Enviar petición POST para restar existencias en la hoja de cálculo
-                fetch("https://script.google.com/macros/s/AKfycbz55no4AWiW4zOItbAVnFQF4paIk8h8_YhcSIHciExx-hzPzqhHGhfarDL_fXYQm3HG/exec", {
+                await fetch(sheetAPIUrl, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(itemsToUpdate)
                 });
             } catch (err) {
-                console.error("Error actualizando stock:", err);
+                console.error("Error enviando actualización de stock:", err);
             }
 
-            // 2. Armar mensaje de WhatsApp
+            // 3. Armar mensaje de WhatsApp
             let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
             let subtotal = 0;
 
@@ -846,17 +844,17 @@
             msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
             msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
-            // 3. Vaciar el carrito local y recargar productos
+            // 4. Vaciar carrito local y actualizar interfaz
             cart = [];
             updateCartUI();
 
             // Redirigir a WhatsApp
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
-            // Recargar el catálogo después de 1 segundo para mostrar las nuevas existencias
+            // Recargar productos después de 2 segundos para mostrar las nuevas existencias
             setTimeout(() => {
                 loadProductsFromSheet();
-            }, 1000);
+            }, 2000);
         }
 
         // NAVEGACIÓN Y MODALES
