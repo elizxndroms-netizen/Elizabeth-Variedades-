@@ -190,7 +190,11 @@
     <!-- GRILLA DE PRODUCTOS -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <!-- Productos cargados con JS -->
+            <!-- Productos cargados con JS / Google Sheets -->
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
+                <p>Cargando catálogo en línea...</p>
+            </div>
         </div>
     </main>
 
@@ -223,7 +227,7 @@
                     </div>
                     <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-1"></h3>
                     <p id="modal-stock" class="text-xs font-bold text-gray-500 mb-2"></p>
-                    <p id="modal-price" class="text-3xl font-extrabold text-pink-600 mb-3"></p>
+                    <div id="modal-price-container" class="mb-3"></div>
                     <p id="modal-desc" class="text-gray-600 text-sm mb-6 leading-relaxed"></p>
                 </div>
 
@@ -383,101 +387,63 @@
             ]
         };
 
-        // CATÁLOGO DE PRODUCTOS CON IMÁGENES MÚLTIPLES Y ETIQUETA DE FOTO
-        const products = [
-            {
-                id: 1,
-                name: "Pijama Para Niño S (SPIRIT)",
-                category: "ropa",
-                subcategory: "ninos",
-                condition: "nuevo",
-                price: 113,
-                stock: 2,
-                image: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80", type: "Foto Real" },
-                    { url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=500&q=80", type: "Modelo" },
-                    { url: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=500&q=80", type: "Detalle" }
-                ],
-                description: "Pijama cómoda de Batman Spirit para niño, manga larga con pantalón estampado."
-            },
-            {
-                id: 2,
-                name: "Playera Azul Casual",
-                category: "ropa",
-                subcategory: "caballeros",
-                condition: "usado",
-                price: 10,
-                stock: 1,
-                image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80", type: "Foto Real" },
-                    { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=500&q=80", type: "Modelo" }
-                ],
-                description: "Playera azul de algodón, usada en excelente estado. Talla M. Única pieza disponible."
-            },
-            {
-                id: 3,
-                name: "Blusa Casual Floral",
-                category: "ropa",
-                subcategory: "damas",
-                condition: "usado",
-                price: 10,
-                stock: 1,
-                image: "https://images.unsplash.com/photo-1564257631407-4deb129f0e6f?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1564257631407-4deb129f0e6f?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
-                ],
-                description: "Blusa fresca de segunda mano, talla M, perfecta para uso diario."
-            },
-            {
-                id: 4,
-                name: "Vestido de Noche Elegante",
-                category: "ropa",
-                subcategory: "damas",
-                condition: "nuevo",
-                price: 85,
-                stock: 3,
-                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=500&q=80", type: "Modelo" },
-                    { url: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
-                ],
-                description: "Vestido completamente nuevo con etiqueta, diseño moderno para eventos."
-            },
-            {
-                id: 5,
-                name: "Tenis Deportivos Blancos",
-                category: "zapatos",
-                subcategory: "damas",
-                condition: "nuevo",
-                price: 120,
-                stock: 4,
-                image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
-                ],
-                description: "Calzado deportivo súper cómodo, talla 38. Suela antideslizante."
-            },
-            {
-                id: 6,
-                name: "Consola Portátil Retro GameBoy",
-                category: "consolas_telefonos",
-                subcategory: "tecnologia",
-                condition: "nuevo",
-                price: 110,
-                stock: 2,
-                image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80",
-                images: [
-                    { url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80", type: "Foto Real" }
-                ],
-                description: "Incluye 400 juegos clásicos instalados, batería recargable y cable de conexión a TV."
-            }
-        ];
-
+        let products = [];
         let cart = [];
         let currentCategory = 'todos';
         let currentSubcategory = 'todos';
+
+        // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
+        async function loadProductsFromSheet() {
+            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycbxMFqNorhryYL_g-ykimKAgEv2fWcaqNyN6NTO19emM0CiZAhYR2I5devDvfjdTqOI_/exec"; // <-- PEGA TU URL DE APPS SCRIPT AQUÍ
+            
+            if (!sheetAPIUrl || sheetAPIUrl.includes("PEGA_AQUÍ")) {
+                document.getElementById('product-grid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500 bg-red-50 rounded-2xl border border-red-200 p-4">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
+                        <p class="font-bold">Falta configurar la URL de tu API de Google Sheets.</p>
+                        <p class="text-xs text-red-400 mt-1">Coloca el enlace generado en Apps Script dentro de la variable 'sheetAPIUrl'.</p>
+                    </div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch(sheetAPIUrl);
+                const data = await response.json();
+
+                products = data.map((row, index) => {
+                    const imgReal = row["url de foto real"] || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
+                    const imgModel = row["url de foto modelo"] || "";
+
+                    let imageArray = [{ url: imgReal, type: "Foto Real" }];
+                    if (imgModel) {
+                        imageArray.push({ url: imgModel, type: "Modelo" });
+                    }
+
+                    return {
+                        id: index + 1,
+                        name: row["nombre del producto"] || "Producto sin nombre",
+                        category: (row["categoria principal"] || "ropa").toLowerCase().trim(),
+                        subcategory: (row["subcategoria"] || "general").toLowerCase().trim(),
+                        condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
+                        price: parseFloat(row["precio actual"]) || 0,
+                        oldPrice: parseFloat(row["precio anterior"]) || 0,
+                        stock: parseInt(row["stock / existencia"]) || 1,
+                        image: imgReal,
+                        images: imageArray,
+                        description: row["descripcion"] || "Sin descripción disponible."
+                    };
+                });
+
+                applyFilters();
+                updateCartUI();
+            } catch (error) {
+                console.error("Error al cargar Google Sheets:", error);
+                document.getElementById('product-grid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500">
+                        <p>Error al conectar con el catálogo en línea. Verifica el acceso de Apps Script.</p>
+                    </div>`;
+            }
+        }
 
         // MOSTRAR MENSAJE TOAST
         function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
@@ -504,12 +470,14 @@
             return product.stock - inCartQty;
         }
 
-        // RENDERIZAR PRODUCTOS
+        // RENDERIZAR PRODUCTOS (Oculta si stock <= 0)
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
 
-            if (items.length === 0) {
+            const availableItems = items.filter(product => getAvailableStock(product.id) > 0);
+
+            if (availableItems.length === 0) {
                 grid.innerHTML = `
                     <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-pink-100 shadow-sm px-4">
                         <div class="w-16 h-16 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -522,14 +490,18 @@
                 return;
             }
 
-            items.forEach(product => {
+            availableItems.forEach(product => {
                 const available = getAvailableStock(product.id);
-                const isOutOfStock = available <= 0;
                 const isNew = product.condition === 'nuevo';
                 const badgeColor = isNew ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
 
+                const hasDiscount = product.oldPrice && product.oldPrice > product.price;
+                const priceHTML = hasDiscount 
+                    ? `<div class="flex items-center space-x-2 mt-1"><span class="line-through text-gray-400 text-xs">Q${product.oldPrice.toFixed(2)}</span><span class="text-lg font-extrabold text-pink-600">Q${product.price.toFixed(2)}</span></div>`
+                    : `<p class="text-lg font-extrabold text-pink-600 mt-1">Q${product.price.toFixed(2)}</p>`;
+
                 const card = document.createElement('div');
-                card.className = `bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col justify-between ${isOutOfStock ? 'opacity-60' : ''}`;
+                card.className = "bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col justify-between";
                 
                 card.innerHTML = `
                     <div onclick="openProductModal(${product.id})" class="cursor-pointer">
@@ -539,29 +511,21 @@
                             <span class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
                                 ${product.condition}
                             </span>
-
-                            ${isOutOfStock ? `
-                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                    <span class="bg-red-600 text-white font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Agotado</span>
-                                </div>
-                            ` : ''}
                         </div>
                         <div class="p-3">
                             <div class="flex justify-between items-center text-xs mb-1">
                                 <span class="text-gray-400 capitalize">${product.category.replace('_', ' ')}</span>
-                                <span class="font-semibold ${available > 0 ? 'text-blue-600' : 'text-red-500'}">
-                                    ${available > 0 ? `Existencia: ${available}` : 'Agotado'}
-                                </span>
+                                <span class="font-semibold text-blue-600">Existencia: ${available}</span>
                             </div>
                             <h3 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h3>
-                            <p class="text-lg font-extrabold text-pink-600 mt-1">Q${product.price.toFixed(2)}</p>
+                            ${priceHTML}
                         </div>
                     </div>
                     <div class="px-3 pb-3">
-                        <button onclick="addToCart(${product.id})" ${isOutOfStock ? 'disabled' : ''} 
-                            class="w-full ${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-pink-50 hover:bg-pink-100 text-pink-600'} font-semibold py-2 text-xs rounded-lg transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid ${isOutOfStock ? 'fa-ban' : 'fa-cart-plus'}"></i>
-                            <span>${isOutOfStock ? 'Agotado' : 'Agregar'}</span>
+                        <button onclick="addToCart(${product.id})" 
+                            class="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold py-2 text-xs rounded-lg transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>Agregar</span>
                         </button>
                     </div>
                 `;
@@ -630,7 +594,7 @@
             let filtered = [...products];
 
             if (currentCategory === 'ofertas') {
-                filtered = filtered.filter(p => p.price <= 20);
+                filtered = filtered.filter(p => p.oldPrice > p.price);
             } else if (currentCategory !== 'todos') {
                 filtered = filtered.filter(p => p.category === currentCategory);
 
@@ -657,7 +621,6 @@
                 tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-gray-800 text-white";
             }
 
-            // Resaltar miniatura activa
             const thumbs = document.querySelectorAll('.thumb-btn');
             thumbs.forEach(tb => tb.classList.remove('border-pink-600', 'ring-2', 'ring-pink-300'));
             
@@ -676,10 +639,8 @@
 
             const imageList = p.images && p.images.length > 0 ? p.images : [{ url: p.image, type: "Foto Real" }];
 
-            // Cargar primera imagen y su etiqueta
             selectModalImage(imageList[0].url, imageList[0].type);
 
-            // Cargar miniaturas
             const thumbContainer = document.getElementById('modal-thumbnails');
             thumbContainer.innerHTML = '';
 
@@ -700,7 +661,13 @@
             });
 
             document.getElementById('modal-title').innerText = p.name;
-            document.getElementById('modal-price').innerText = `Q${p.price.toFixed(2)}`;
+            
+            const hasDiscount = p.oldPrice && p.oldPrice > p.price;
+            const modalPriceContainer = document.getElementById('modal-price-container');
+            modalPriceContainer.innerHTML = hasDiscount
+                ? `<div class="flex items-center space-x-3"><span class="line-through text-gray-400 text-base">Q${p.oldPrice.toFixed(2)}</span><span class="text-3xl font-extrabold text-pink-600">Q${p.price.toFixed(2)}</span></div>`
+                : `<span class="text-3xl font-extrabold text-pink-600">Q${p.price.toFixed(2)}</span>`;
+
             document.getElementById('modal-desc').innerText = p.description;
             document.getElementById('modal-badge-category').innerText = p.category.replace('_', ' ');
 
@@ -846,6 +813,9 @@
                 const totalItem = i.price * i.qty;
                 subtotal += totalItem;
                 msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+                if (i.image) {
+                    msg += `  📷 *Foto:* ${i.image}\n`;
+                }
             });
 
             msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
@@ -884,7 +854,7 @@
 
         // INICIALIZAR
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts(products);
+            loadProductsFromSheet();
             updateCartUI();
         });
     </script>
