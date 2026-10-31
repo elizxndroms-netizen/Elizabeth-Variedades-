@@ -143,6 +143,25 @@
                 <!-- Se insertan dinámicamente -->
             </div>
         </div>
+
+        <!-- BARRA DE BÚSQUEDA Y ORDENAMIENTO (Opciones 1 y 3) -->
+        <div class="bg-gray-50 border-t py-2.5 px-4">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full sm:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Buscar prendas, calzado..." class="w-full pl-9 pr-4 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <label for="sort-select" class="text-xs text-gray-500 font-semibold whitespace-nowrap"><i class="fa-solid fa-arrow-down-short-wide mr-1"></i>Ordenar por:</label>
+                    <select id="sort-select" onchange="applyFilters()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
+                        <option value="default">Relevancia</option>
+                        <option value="price-asc">Precio: Menor a Mayor</option>
+                        <option value="price-desc">Precio: Mayor a Menor</option>
+                        <option value="stock-desc">Mayor Existencia</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- SECCIÓN ILUSTRADA: ¿CÓMO COMPRAR? -->
@@ -347,7 +366,7 @@
                 <h4 class="text-sm font-semibold text-gray-200 mb-2">Redes Sociales</h4>
                 <div class="flex space-x-4">
                     <a href="https://www.facebook.com/share/1DA4FRRLuL/" target="_blank" class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/invites/contact/?utm_content=smj3wo6&xtok=jvi4akyxxkl9"></i></a>
+                    <a href="https://www.instagram.com/invites/contact/?utm_content=smj3wo6&xtok=jvi4akyxxkl9" target="_blank" class="w-9 h-9 bg-pink-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-instagram"></i></a>
                     <a href="https://www.tiktok.com/@elizabeth.varieda05?_r=1&_t=ZS-9AwokNILJuW" target="_blank" class="w-9 h-9 bg-black border border-gray-700 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-tiktok"></i></a>
                 </div>
             </div>
@@ -475,7 +494,7 @@
             return product.stock - inCartQty;
         }
 
-        // RENDERIZAR PRODUCTOS
+        // RENDERIZAR PRODUCTOS (Con etiqueta de "¡Última pieza!")
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -488,8 +507,8 @@
                         <div class="w-16 h-16 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
                             <i class="fa-solid fa-clock"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-gray-800">Próximamente</h3>
-                        <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Estamos preparando nuevas prendas y artículos para esta sección. ¡Vuelve pronto a revisar!</p>
+                        <h3 class="text-xl font-extrabold text-gray-800">No se encontraron productos</h3>
+                        <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Prueba ajustando tu búsqueda o cambiando de categoría.</p>
                     </div>
                 `;
                 return;
@@ -499,6 +518,11 @@
                 const available = getAvailableStock(product.id);
                 const isNew = product.condition === 'nuevo';
                 const badgeColor = isNew ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+
+                // Etiqueta de urgencia si solo queda 1
+                const lastPieceBadge = available === 1 
+                    ? `<span class="absolute top-2 right-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-red-600 text-white animate-pulse shadow">¡Última pieza!</span>` 
+                    : '';
 
                 const hasDiscount = product.oldPrice && product.oldPrice > product.price;
                 const priceHTML = hasDiscount 
@@ -516,11 +540,12 @@
                             <span class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
                                 ${product.condition}
                             </span>
+                            ${lastPieceBadge}
                         </div>
                         <div class="p-3">
                             <div class="flex justify-between items-center text-xs mb-1">
                                 <span class="text-gray-400 capitalize">${product.category.replace('_', ' ')}</span>
-                                <span class="font-semibold text-blue-600">Existencia: ${available}</span>
+                                <span class="font-semibold ${available === 1 ? 'text-red-600 font-extrabold' : 'text-blue-600'}">Existencia: ${available}</span>
                             </div>
                             <h3 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h3>
                             ${priceHTML}
@@ -595,8 +620,11 @@
             applyFilters();
         }
 
+        // FILTRADO, BÚSQUEDA Y ORDENAMIENTO (Opciones 1 y 3)
         function applyFilters() {
             let filtered = [...products];
+            const searchTerm = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase().trim() : '';
+            const sortOption = document.getElementById('sort-select') ? document.getElementById('sort-select').value : 'default';
 
             if (currentCategory === 'ofertas') {
                 filtered = filtered.filter(p => p.oldPrice > p.price);
@@ -606,6 +634,23 @@
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
                     filtered = filtered.filter(p => p.subcategory === currentSubcategory);
                 }
+            }
+
+            // Filtrar por barra de búsqueda
+            if (searchTerm !== '') {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    p.description.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Ordenar productos
+            if (sortOption === 'price-asc') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortOption === 'price-desc') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortOption === 'stock-desc') {
+                filtered.sort((a, b) => b.stock - a.stock);
             }
 
             renderProducts(filtered);
@@ -678,7 +723,7 @@
 
             const stockText = document.getElementById('modal-stock');
             stockText.innerText = available > 0 ? `Unidades disponibles: ${available}` : '¡Sin existencias!';
-            stockText.className = `text-xs font-bold mb-2 ${available > 0 ? 'text-blue-600' : 'text-red-500'}`;
+            stockText.className = `text-xs font-bold mb-2 ${available > 0 ? (available === 1 ? 'text-red-600 font-extrabold' : 'text-blue-600') : 'text-red-500'}`;
 
             const badgeCond = document.getElementById('modal-badge-condition');
             badgeCond.innerText = p.condition.toUpperCase();
@@ -800,63 +845,62 @@
             document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
         }
 
-     async function checkoutWhatsApp() {
-          if (cart.length === 0) {
-              alert('Añade al menos un producto al carrito para comprar.');
-              return;
-          }
+        async function checkoutWhatsApp() {
+            if (cart.length === 0) {
+                alert('Añade al menos un producto al carrito para comprar.');
+                return;
+            }
 
-          const phone = "50238552558";
-          const shippingSelect = document.getElementById('shipping-select');
-          const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
-          const shippingCost = parseFloat(shippingSelect.value);
-          const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
+            const phone = "50238552558";
+            const shippingSelect = document.getElementById('shipping-select');
+            const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+            const shippingCost = parseFloat(shippingSelect.value);
+            const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
 
-          // 1. Enviar la actualización usando un iframe oculto (simula abrir la URL en una pestaña invisible)
-          cart.forEach(item => {
-              const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
-              
-              const iframe = document.createElement('iframe');
-              iframe.style.display = 'none';
-              iframe.src = updateUrl;
-              document.body.appendChild(iframe);
+            // 1. Enviar la actualización usando un iframe oculto
+            cart.forEach(item => {
+                const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = updateUrl;
+                document.body.appendChild(iframe);
 
-              // Eliminar el iframe después de 5 segundos para mantener limpia la página
-              setTimeout(() => {
-                  document.body.removeChild(iframe);
-              }, 5000);
-          });
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 5000);
+            });
 
-          // 2. Armar mensaje de WhatsApp
-          let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
-          let subtotal = 0;
+            // 2. Armar mensaje de WhatsApp
+            let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
+            let subtotal = 0;
 
-          cart.forEach(i => {
-              const totalItem = i.price * i.qty;
-              subtotal += totalItem;
-              msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
-              if (i.image) {
-                  msg += `  📷 *Foto:* ${i.image}\n`;
-              }
-          });
+            cart.forEach(i => {
+                const totalItem = i.price * i.qty;
+                subtotal += totalItem;
+                msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+                if (i.image) {
+                    msg += `  📷 *Foto:* ${i.image}\n`;
+                }
+            });
 
-          msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
-          msg += `\n*Lugar de Envío:* ${shippingText}`;
-          msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
-          msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
+            msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
+            msg += `\n*Lugar de Envío:* ${shippingText}`;
+            msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
+            msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
-          // 3. Vaciar carrito local y actualizar interfaz
-          cart = [];
-          updateCartUI();
+            // 3. Vaciar carrito local y actualizar interfaz
+            cart = [];
+            updateCartUI();
 
-          // Redirigir a WhatsApp
-          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            // Redirigir a WhatsApp
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
-          // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
-          setTimeout(() => {
-              loadProductsFromSheet();
-          }, 2000);
-      }
+            // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
+            setTimeout(() => {
+                loadProductsFromSheet();
+            }, 2000);
+        }
+
         // NAVEGACIÓN Y MODALES
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
