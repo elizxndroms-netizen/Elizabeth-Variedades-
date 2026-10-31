@@ -144,7 +144,7 @@
             </div>
         </div>
 
-        <!-- BARRA DE BÚSQUEDA Y ORDENAMIENTO (Opciones 1 y 3) -->
+        <!-- BARRA DE BÚSQUEDA Y ORDENAMIENTO -->
         <div class="bg-gray-50 border-t py-2.5 px-4">
             <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-center justify-between">
                 <div class="relative w-full sm:w-80">
@@ -174,28 +174,24 @@
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <!-- Paso 1 -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
                     <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">1</div>
                     <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-magnifying-glass"></i></div>
                     <h3 class="font-bold text-sm text-gray-800 mb-1">Explora</h3>
                     <p class="text-xs text-gray-500">Elige ropa, zapatos o accesorios y toca cualquier tarjeta para ver detalles y fotos reales.</p>
                 </div>
-                <!-- Paso 2 -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
                     <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">2</div>
                     <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-cart-plus"></i></div>
                     <h3 class="font-bold text-sm text-gray-800 mb-1">Agrega al Carrito</h3>
                     <p class="text-xs text-gray-500">Revisa las existencias disponibles y presiona <b>"Agregar"</b> en tus favoritos.</p>
                 </div>
-                <!-- Paso 3 -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
                     <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">3</div>
                     <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-truck-fast"></i></div>
                     <h3 class="font-bold text-sm text-gray-800 mb-1">Selecciona Envío</h3>
-                    <p class="text-xs text-gray-500">Abre tu carrito y elige tu zona ,si tu pedido es para la capital o departamento,tienes que depositar solo el costo del envio para que se te pueda hacer tu envio por medio de CargoExpres y pagues el total del producto al recibir (Parque San Juan es <b>GRATIS</b>).</p>
+                    <p class="text-xs text-gray-500">Abre tu carrito y elige tu zona, si tu pedido es para la capital o departamento, tienes que depositar solo el costo del envío para que se te pueda hacer tu envío por medio de CargoExpres y pagues el total del producto al recibir (Parque San Juan es <b>GRATIS</b>).</p>
                 </div>
-                <!-- Paso 4 -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
                     <div class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">4</div>
                     <div class="text-green-600 text-xl mb-2"><i class="fa-brands fa-whatsapp"></i></div>
@@ -209,7 +205,6 @@
     <!-- GRILLA DE PRODUCTOS -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <!-- Productos cargados con JS / Google Sheets -->
             <div class="col-span-full text-center py-12 text-gray-400">
                 <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
                 <p>Cargando catálogo en línea...</p>
@@ -217,12 +212,11 @@
         </div>
     </main>
 
-    <!-- MODAL DETALLE DE PRODUCTO CON CARRUSEL Y ETIQUETAS DE TIPO DE FOTO -->
+    <!-- MODAL DETALLE DE PRODUCTO CON CARRUSEL Y ETIQUETAS -->
     <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]">
             <button onclick="closeProductModal()" class="absolute top-3 right-3 bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center z-20 shadow"><i class="fa-solid fa-xmark"></i></button>
             
-            <!-- VISTA DE IMÁGENES Y GALERÍA -->
             <div class="md:w-1/2 bg-gray-100 p-4 flex flex-col items-center justify-between overflow-y-auto">
                 <div class="relative w-full flex-grow flex items-center justify-center bg-white rounded-xl shadow-inner p-2 min-h-[220px]">
                     <span id="modal-image-tag" class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10"></span>
@@ -231,13 +225,9 @@
                     </div>
                 </div>
 
-                <!-- GALERÍA DE MINIATURAS CON ETIQUETAS -->
-                <div id="modal-thumbnails" class="flex space-x-2 overflow-x-auto w-full pt-3 pb-1 justify-start no-scrollbar">
-                    <!-- Insertados con JS -->
-                </div>
+                <div id="modal-thumbnails" class="flex space-x-2 overflow-x-auto w-full pt-3 pb-1 justify-start no-scrollbar"></div>
             </div>
 
-            <!-- DETALLES Y BOTÓN DE COMPRA -->
             <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
                 <div>
                     <div class="flex items-center space-x-2 mb-2">
@@ -262,34 +252,17 @@
     <div id="how-to-buy-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
             <button onclick="closeHowToBuyModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            
             <div class="text-center mb-4">
-                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                </div>
+                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fa-solid fa-bag-shopping"></i></div>
                 <h3 class="text-xl font-bold text-gray-800">¿Cómo realizar tu pedido?</h3>
                 <p class="text-xs text-gray-500">Guía rápida de Variedades Elizabeth</p>
             </div>
-
             <div class="space-y-4 text-xs text-gray-700">
-                <div class="flex items-start space-x-3">
-                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">1</span>
-                    <p><b>Busca tus productos:</b> Explora entre ropa desde Q10, calzado, consolas y accesorios. Toca cualquier producto para ver sus fotos reales y de modelo ampliada.</p>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">2</span>
-                    <p><b>Añade al Carrito:</b> Presiona <b>"Agregar"</b>. Cada prenda muestra su existencia actual y el sistema se encargará de ocultarla o marcarla como agotada si se terminan.</p>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">3</span>
-                    <p><b>Elige tu Zona de Envío:</b> Abre tu carrito arriba a la derecha y selecciona tu ubicación (Parque San Juan es gratis, zonas de San Juan Q10, aldeas Q15, San Pedro/Sajcavilla Q20, Capital Q35 y Departamentos Q40).</p>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">4</span>
-                    <p><b>Envía tu pedido:</b> Toca el botón verde de <b>"Comprar por WhatsApp"</b> para mandar el resumen directo a la encargada y coordinar entrega y pago.</p>
-                </div>
+                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">1</span><p><b>Busca tus productos:</b> Explora o usa el buscador para hallar ropa, zapatos y accesorios.</p></div>
+                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">2</span><p><b>Añade al Carrito:</b> Presiona <b>"Agregar"</b>. Revisa las existencias disponibles.</p></div>
+                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">3</span><p><b>Elige tu Zona de Envío:</b> Selecciona tu ubicación en el carrito.</p></div>
+                <div class="flex items-start space-x-3"><span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">4</span><p><b>Envía tu pedido:</b> Toca el botón verde para enviar tu pedido por WhatsApp.</p></div>
             </div>
-
             <button onclick="closeHowToBuyModal()" class="w-full mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl shadow text-xs">Entendido, ¡ir a comprar!</button>
         </div>
     </div>
@@ -298,9 +271,7 @@
     <div id="about-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
             <button onclick="closeAboutModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="w-16 h-16 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                <i class="fa-solid fa-store"></i>
-            </div>
+            <div class="w-16 h-16 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-store"></i></div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Variedades Elizabeth</h3>
             <p class="text-gray-600 text-sm mb-4">Tu tienda de confianza con la mejor selección de ropa, zapatos, accesorios, novedades y mucho más en San Juan Sacatepéquez.</p>
             <p class="text-xs text-gray-400 border-t pt-3">¡Hacemos envíos locales y a todo el país!</p>
@@ -314,9 +285,7 @@
             <button onclick="toggleCart()" class="hover:bg-pink-700 p-1 rounded-full"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
 
-        <div id="cart-items" class="p-4 overflow-y-auto flex-grow space-y-3">
-            <!-- Items del carrito -->
-        </div>
+        <div id="cart-items" class="p-4 overflow-y-auto flex-grow space-y-3"></div>
 
         <div class="p-4 bg-gray-50 border-t space-y-3">
             <div>
@@ -326,8 +295,8 @@
                     <option value="10">Zonas de San Juan 1 a 5 (Q10.00)</option>
                     <option value="15">Aldeas aledañas (Q15.00)</option>
                     <option value="20">San Pedro Sac. / Sajcavilla (Q20.00)</option>
-                    <option value="35">Ciudad Capital / Alrededores(deposito previo de costo de envio y pagas el total al recibir) (Q35.00)</option>
-                    <option value="40">Departamentos del país (deposito previo de costo de envio y pagas el total al recibir) (Q40.00)</option>
+                    <option value="35">Ciudad Capital / Alrededores (depósito previo de costo de envío y pagas el total al recibir) (Q35.00)</option>
+                    <option value="40">Departamentos del país (depósito previo de costo de envío y pagas el total al recibir) (Q40.00)</option>
                 </select>
             </div>
 
@@ -371,14 +340,11 @@
                 </div>
             </div>
         </div>
-        <div class="text-center text-xs text-gray-500 border-t border-gray-800 pt-4">
-            &copy; 2026 Variedades Elizabeth.
-        </div>
+        <div class="text-center text-xs text-gray-500 border-t border-gray-800 pt-4">&copy; 2026 Variedades Elizabeth.</div>
     </footer>
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script>
-        // CONFIGURACIÓN DE SUBCATEGORÍAS CON ÍCONOS
         const subcategoryConfig = {
             ropa: [
                 { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
@@ -411,22 +377,17 @@
         let currentCategory = 'todos';
         let currentSubcategory = 'todos';
 
-        // FUNCIÓN PARA CONVERTIR ENLACES DE GOOGLE DRIVE EN FOTOS DIRECTAS
         function fixDriveImageUrl(url) {
             if (!url) return '';
             if (url.includes('drive.google.com')) {
                 const match = url.match(/[-\w]{25,}/);
-                if (match) {
-                    return `https://lh3.googleusercontent.com/d/${match[0]}`;
-                }
+                if (match) return `https://lh3.googleusercontent.com/d/${match[0]}`;
             }
             return url;
         }
 
-        // CARGAR PRODUCTOS DESDE GOOGLE SHEETS
         async function loadProductsFromSheet() {
             const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
-            
             try {
                 const response = await fetch(sheetAPIUrl);
                 const data = await response.json();
@@ -435,12 +396,27 @@
                     const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
                     const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
 
-                    const imgReal = fixDriveImageUrl(row["foto real"]) || "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80";
-                    const imgModel = fixDriveImageUrl(row["foto de referencia"]) || "";
+                    // RECOLECCIÓN DINÁMICA DE MÚLTIPLES FOTOS (Detecta cualquier columna que contenga "foto")
+                    let imageArray = [];
+                    for (let key in row) {
+                        if (key.toLowerCase().includes("foto") && row[key]) {
+                            let fixedUrl = fixDriveImageUrl(row[key]);
+                            if (fixedUrl) {
+                                // Asignar etiqueta según el nombre de la columna en Google Sheets
+                                let labelName = "Foto";
+                                let lowerKey = key.toLowerCase();
+                                if (lowerKey.includes("real")) labelName = "Foto Real";
+                                else if (lowerKey.includes("referencia")) labelName = "Modelo";
+                                else labelName = `Foto ${imageArray.length + 1}`;
 
-                    let imageArray = [{ url: imgReal, type: "Foto Real" }];
-                    if (imgModel) {
-                        imageArray.push({ url: imgModel, type: "Modelo" });
+                                imageArray.push({ url: fixedUrl, type: labelName });
+                            }
+                        }
+                    }
+
+                    // Si no encontró ninguna foto, poner una por defecto
+                    if (imageArray.length === 0) {
+                        imageArray.push({ url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80", type: "Foto" });
                     }
 
                     return {
@@ -452,9 +428,9 @@
                         price: parseFloat(rawPrice) || 0,
                         oldPrice: parseFloat(rawOldPrice) || 0,
                         stock: (row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
-                        image: imgReal,
+                        image: imageArray[0].url,
                         images: imageArray,
-                        description: row["descripcion"] || "Sin descripción disponible."
+                        description: row["Descripción"] || row["descripcion"] || "Sin descripción disponible."
                     };
                 });
 
@@ -469,32 +445,25 @@
             }
         }
 
-        // MOSTRAR MENSAJE TOAST
         function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
             const toast = document.getElementById('toast');
             document.getElementById('toast-title').innerText = title;
             document.getElementById('toast-msg').innerText = msg;
-
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 2500);
         }
 
-        // CALCULAR STOCK DISPONIBLE
         function getAvailableStock(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return 0;
-
             const cartItem = cart.find(i => i.id === productId);
-            const inCartQty = cartItem ? cartItem.qty : 0;
-            return product.stock - inCartQty;
+            return product.stock - (cartItem ? cartItem.qty : 0);
         }
 
-        // RENDERIZAR PRODUCTOS (Con etiqueta de "¡Última pieza!")
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -519,7 +488,6 @@
                 const isNew = product.condition === 'nuevo';
                 const badgeColor = isNew ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
 
-                // Etiqueta de urgencia si solo queda 1
                 const lastPieceBadge = available === 1 
                     ? `<span class="absolute top-2 right-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-red-600 text-white animate-pulse shadow">¡Última pieza!</span>` 
                     : '';
@@ -563,7 +531,6 @@
             });
         }
 
-        // CONTROL DE FILTRADO Y SUBCATEGORÍAS
         function filterCategory(category) {
             currentCategory = category;
             currentSubcategory = 'todos';
@@ -620,7 +587,6 @@
             applyFilters();
         }
 
-        // FILTRADO, BÚSQUEDA Y ORDENAMIENTO (Opciones 1 y 3)
         function applyFilters() {
             let filtered = [...products];
             const searchTerm = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase().trim() : '';
@@ -636,7 +602,6 @@
                 }
             }
 
-            // Filtrar por barra de búsqueda
             if (searchTerm !== '') {
                 filtered = filtered.filter(p => 
                     p.name.toLowerCase().includes(searchTerm) || 
@@ -644,7 +609,6 @@
                 );
             }
 
-            // Ordenar productos
             if (sortOption === 'price-asc') {
                 filtered.sort((a, b) => a.price - b.price);
             } else if (sortOption === 'price-desc') {
@@ -656,20 +620,12 @@
             renderProducts(filtered);
         }
 
-        // CAMBIAR IMAGEN SELECCIONADA EN EL MODAL Y ACTUALIZAR ETIQUETA
         function selectModalImage(url, type) {
             document.getElementById('modal-img').src = url;
 
             const tagEl = document.getElementById('modal-image-tag');
             tagEl.innerText = type || "Foto";
-            
-            if (type === "Foto Real") {
-                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-emerald-600 text-white";
-            } else if (type === "Modelo") {
-                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-blue-600 text-white";
-            } else {
-                tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-gray-800 text-white";
-            }
+            tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-emerald-600 text-white";
 
             const thumbs = document.querySelectorAll('.thumb-btn');
             thumbs.forEach(tb => tb.classList.remove('border-pink-600', 'ring-2', 'ring-pink-300'));
@@ -679,7 +635,6 @@
             }
         }
 
-        // MODAL DE PRODUCTO
         function openProductModal(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
@@ -687,7 +642,7 @@
             const available = getAvailableStock(p.id);
             const isOutOfStock = available <= 0;
 
-            const imageList = p.images && p.images.length > 0 ? p.images : [{ url: p.image, type: "Foto Real" }];
+            const imageList = p.images && p.images.length > 0 ? p.images : [{ url: p.image, type: "Foto" }];
 
             selectModalImage(imageList[0].url, imageList[0].type);
 
@@ -695,16 +650,13 @@
             thumbContainer.innerHTML = '';
 
             imageList.forEach((imgObj, idx) => {
-                const isReal = imgObj.type === "Foto Real";
-                const badgeBg = isReal ? 'bg-emerald-600' : 'bg-blue-600';
-
                 const btn = document.createElement('button');
                 btn.className = `thumb-btn flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 bg-white relative transition hover:opacity-90 ${idx === 0 ? 'border-pink-600 ring-2 ring-pink-300' : 'border-gray-200'}`;
                 btn.onclick = (e) => selectModalImage(imgObj.url, imgObj.type);
                 btn.innerHTML = `
                     <img src="${imgObj.url}" class="w-full h-full object-cover">
-                    <span class="absolute bottom-0 inset-x-0 ${badgeBg} text-white text-[8px] font-extrabold text-center py-0.5 truncate uppercase">
-                        ${imgObj.type || 'Foto'}
+                    <span class="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[8px] font-extrabold text-center py-0.5 truncate uppercase">
+                        ${imgObj.type}
                     </span>
                 `;
                 thumbContainer.appendChild(btn);
@@ -751,7 +703,6 @@
             document.getElementById('product-modal').classList.add('hidden');
         }
 
-        // CARRITO Y STOCK
         function addToCart(id) {
             const available = getAvailableStock(id);
             if (available <= 0) {
@@ -762,11 +713,8 @@
             const p = products.find(prod => prod.id === id);
             const item = cart.find(i => i.id === id);
 
-            if (item) {
-                item.qty++;
-            } else {
-                cart.push({ ...p, qty: 1 });
-            }
+            if (item) item.qty++;
+            else cart.push({ ...p, qty: 1 });
 
             showToast("¡Se ha agregado a tu pedido!", `${p.name} se añadió correctamente.`);
             updateCartUI();
@@ -782,21 +730,13 @@
         function changeQty(id, delta) {
             const item = cart.find(i => i.id === id);
             if (item) {
-                if (delta > 0) {
-                    const available = getAvailableStock(id);
-                    if (available <= 0) {
-                        alert("No hay más existencias disponibles de este producto.");
-                        return;
-                    }
+                if (delta > 0 && getAvailableStock(id) <= 0) {
+                    alert("No hay más existencias disponibles de este producto.");
+                    return;
                 }
-
                 item.qty += delta;
-                if (item.qty <= 0) {
-                    removeFromCart(id);
-                } else {
-                    updateCartUI();
-                    applyFilters();
-                }
+                if (item.qty <= 0) removeFromCart(id);
+                else { updateCartUI(); applyFilters(); }
             }
         }
 
@@ -831,18 +771,15 @@
                     cartContainer.appendChild(row);
                 });
             }
-
             updateCartTotal();
         }
 
         function updateCartTotal() {
             const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
             const shipping = parseFloat(document.getElementById('shipping-select').value) || 0;
-            const total = subtotal + shipping;
-
             document.getElementById('cart-subtotal').innerText = `Q${subtotal.toFixed(2)}`;
             document.getElementById('cart-shipping').innerText = `Q${shipping.toFixed(2)}`;
-            document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `Q${(subtotal + shipping).toFixed(2)}`;
         }
 
         async function checkoutWhatsApp() {
@@ -857,30 +794,22 @@
             const shippingCost = parseFloat(shippingSelect.value);
             const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
 
-            // 1. Enviar la actualización usando un iframe oculto
             cart.forEach(item => {
                 const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 iframe.src = updateUrl;
                 document.body.appendChild(iframe);
-
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                }, 5000);
+                setTimeout(() => { document.body.removeChild(iframe); }, 5000);
             });
 
-            // 2. Armar mensaje de WhatsApp
             let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
             let subtotal = 0;
-
             cart.forEach(i => {
                 const totalItem = i.price * i.qty;
                 subtotal += totalItem;
                 msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
-                if (i.image) {
-                    msg += `  📷 *Foto:* ${i.image}\n`;
-                }
+                if (i.image) msg += `  📷 *Foto:* ${i.image}\n`;
             });
 
             msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
@@ -888,46 +817,22 @@
             msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
             msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
-            // 3. Vaciar carrito local y actualizar interfaz
             cart = [];
             updateCartUI();
-
-            // Redirigir a WhatsApp
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-
-            // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
-            setTimeout(() => {
-                loadProductsFromSheet();
-            }, 2000);
+            setTimeout(() => { loadProductsFromSheet(); }, 2000);
         }
 
-        // NAVEGACIÓN Y MODALES
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
+        function toggleCart() { document.getElementById('cart-drawer').classList.toggle('translate-x-full'); }
+        function openAboutModal() { document.getElementById('about-modal').classList.remove('hidden'); }
+        function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
+        function openHowToBuyModal() { document.getElementById('how-to-buy-modal').classList.remove('hidden'); }
+        function closeHowToBuyModal() { document.getElementById('how-to-buy-modal').classList.add('hidden'); }
 
-        function toggleCart() {
-            document.getElementById('cart-drawer').classList.toggle('translate-x-full');
-        }
-
-        function openAboutModal() {
-            document.getElementById('about-modal').classList.remove('hidden');
-        }
-
-        function closeAboutModal() {
-            document.getElementById('about-modal').classList.add('hidden');
-        }
-
-        function openHowToBuyModal() {
-            document.getElementById('how-to-buy-modal').classList.remove('hidden');
-        }
-
-        function closeHowToBuyModal() {
-            document.getElementById('how-to-buy-modal').classList.add('hidden');
-        }
-
-        // INICIALIZAR
         document.addEventListener('DOMContentLoaded', () => {
             loadProductsFromSheet();
             updateCartUI();
