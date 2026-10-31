@@ -800,59 +800,63 @@
             document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
         }
 
-      async function checkoutWhatsApp() {
-    if (cart.length === 0) {
-        alert('Añade al menos un producto al carrito para comprar.');
-        return;
-    }
+     async function checkoutWhatsApp() {
+          if (cart.length === 0) {
+              alert('Añade al menos un producto al carrito para comprar.');
+              return;
+          }
 
-    const phone = "50238552558";
-    const shippingSelect = document.getElementById('shipping-select');
-    const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
-    const shippingCost = parseFloat(shippingSelect.value);
-    const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
+          const phone = "50238552558";
+          const shippingSelect = document.getElementById('shipping-select');
+          const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+          const shippingCost = parseFloat(shippingSelect.value);
+          const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
 
-    // 1. Enviar la actualización de stock usando peticiones GET (evita bloqueos de seguridad)
-    for (const item of cart) {
-        try {
-            const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
-            await fetch(updateUrl, { mode: 'no-cors' });
-        } catch (err) {
-            console.error("Error actualizando stock:", err);
-        }
-    }
+          // 1. Enviar la actualización usando un iframe oculto (simula abrir la URL en una pestaña invisible)
+          cart.forEach(item => {
+              const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
+              
+              const iframe = document.createElement('iframe');
+              iframe.style.display = 'none';
+              iframe.src = updateUrl;
+              document.body.appendChild(iframe);
 
-    // 2. Armar mensaje de WhatsApp
-    let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
-    let subtotal = 0;
+              // Eliminar el iframe después de 5 segundos para mantener limpia la página
+              setTimeout(() => {
+                  document.body.removeChild(iframe);
+              }, 5000);
+          });
 
-    cart.forEach(i => {
-        const totalItem = i.price * i.qty;
-        subtotal += totalItem;
-        msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
-        if (i.image) {
-            msg += `  📷 *Foto:* ${i.image}\n`;
-        }
-    });
+          // 2. Armar mensaje de WhatsApp
+          let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
+          let subtotal = 0;
 
-    msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
-    msg += `\n*Lugar de Envío:* ${shippingText}`;
-    msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
-    msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
+          cart.forEach(i => {
+              const totalItem = i.price * i.qty;
+              subtotal += totalItem;
+              msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
+              if (i.image) {
+                  msg += `  📷 *Foto:* ${i.image}\n`;
+              }
+          });
 
-    // 3. Vaciar carrito local y actualizar interfaz
-    cart = [];
-    updateCartUI();
+          msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
+          msg += `\n*Lugar de Envío:* ${shippingText}`;
+          msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
+          msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
 
-    // Redirigir a WhatsApp
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+          // 3. Vaciar carrito local y actualizar interfaz
+          cart = [];
+          updateCartUI();
 
-    // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
-    setTimeout(() => {
-        loadProductsFromSheet();
-    }, 2000);
-}
+          // Redirigir a WhatsApp
+          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
+          // Recargar productos después de 2 segundos para ver reflejado el nuevo stock en la web
+          setTimeout(() => {
+              loadProductsFromSheet();
+          }, 2000);
+      }
         // NAVEGACIÓN Y MODALES
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
