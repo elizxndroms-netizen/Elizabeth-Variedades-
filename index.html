@@ -432,7 +432,7 @@
                         condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
                         price: parseFloat(rawPrice) || 0,
                         oldPrice: parseFloat(rawOldPrice) || 0,
-                        stock: parseInt(row["stock"]) || 1,
+                        stock: (row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
                         image: imgReal,
                         images: imageArray,
                         description: row["descripcion"] || "Sin descripción disponible."
