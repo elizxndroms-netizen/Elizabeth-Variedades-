@@ -387,16 +387,26 @@
             return url;
         }
 
-        async function loadProductsFromSheet() {
+            async function loadProductsFromSheet() {
             const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
             try {
                 const response = await fetch(sheetAPIUrl);
                 const data = await response.json();
 
                 products = data.map((row, index) => {
-                    const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
-                    const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
+                    const rawPrice = row["precio actual"] || row["Precio Actual"] || row["precio"] || "0";
+                    const rawOldPrice = row["precio anterior"] || row["Precio Anterior"] || "0";
 
+                    // Búsqueda inteligente de la descripción en cualquier columna que contenga "descrip"
+                    let descText = "";
+                    for (let key in row) {
+                        if (key.toLowerCase().includes("descrip") && row[key]) {
+                            descText = row[key];
+                            break;
+                        }
+                    }
+
+                    // Recolección de fotos
                     let imageArray = [];
                     for (let key in row) {
                         if (key.toLowerCase().includes("foto") && row[key]) {
@@ -419,16 +429,16 @@
 
                     return {
                         id: index + 1,
-                        name: row["nombre del producto"] || "Producto sin nombre",
-                        category: (row["categoria principal"] || "ropa").toLowerCase().trim(),
-                        subcategory: (row["subcategoria"] || "general").toLowerCase().trim(),
-                        condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
-                        price: parseFloat(rawPrice) || 0,
-                        oldPrice: parseFloat(rawOldPrice) || 0,
-                        stock: (row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
+                        name: row["nombre del producto"] || row["Nombre del producto"] || "Producto sin nombre",
+                        category: (row["categoria principal"] || row["Categoría principal"] || "ropa").toLowerCase().trim(),
+                        subcategory: (row["subcategoria"] || row["Subcategoría"] || "general").toLowerCase().trim(),
+                        condition: (row["condicion"] || row["Condición"] || "nuevo").toLowerCase().trim(),
+                        price: parseFloat(rawPrice.toString().replace(/[^0-9.]/g, '')) || 0,
+                        oldPrice: parseFloat(rawOldPrice.toString().replace(/[^0-9.]/g, '')) || 0,
+                        stock: (row["stock"] !== undefined && row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
                         image: imageArray[0].url,
                         images: imageArray,
-                        description: row["Descripción"] || row["descripcion"] || row["DESCRIPCIÓN"] || row["descripción"] || "Sin descripción disponible."
+                        description: descText || "Sin descripción disponible."
                     };
                 });
 
@@ -442,7 +452,6 @@
                     </div>`;
             }
         }
-
         function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
             const toast = document.getElementById('toast');
             document.getElementById('toast-title').innerText = title;
