@@ -127,14 +127,14 @@
         </div>
     </aside>
 
-    <!-- BARRA PRINCIPAL DE CATEGORÍAS -->
+<!-- BARRA PRINCIPAL DE CATEGORÍAS -->
     <div class="bg-white shadow-sm border-b sticky top-[68px] z-20">
         <div class="max-w-7xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar">
             <button onclick="filterCategory('todos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm">Todos</button>
-            <button onclick="filterCategory('ropa')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Ropa</button>
-            <button onclick="filterCategory('zapatos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Zapatos</button>
-            <button onclick="filterCategory('accesorios')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Accesorios</button>
-            <button onclick="filterCategory('consolas_telefonos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Consolas & Teléfonos</button>
+            <button onclick="filterCategory('Ropa')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Ropa</button>
+            <button onclick="filterCategory('Zapatos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Zapatos</button>
+            <button onclick="filterCategory('Accesorios')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Accesorios</button>
+            <button onclick="filterCategory('Consolas & Teléfonos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Consolas & Teléfonos</button>
         </div>
 
         <!-- BARRA SECUNDARIA DE SUBCATEGORÍAS CON ÍCONOS -->
@@ -346,29 +346,29 @@
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script>
-        const subcategoryConfig = {
+      const subcategoryConfig = {
             ropa: [
                 { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
-                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
-                { id: 'bebes', label: 'Bebés', icon: 'fa-solid fa-baby' },
-                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
-                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' },
+                { id: 'niños', label: 'Niños', icon: 'fa-solid fa-child' },
+                { id: 'bebés', label: 'Bebés', icon: 'fa-solid fa-baby' },
+                { id: 'dama', label: 'Damas', icon: 'fa-solid fa-person-dress' },
+                { id: 'caballero', label: 'Caballeros', icon: 'fa-solid fa-user-tie' },
                 { id: 'juvenil', label: 'Juvenil', icon: 'fa-solid fa-graduation-cap' },
-                { id: 'ropa_interior', label: 'Ropa Interior', icon: 'fa-solid fa-socks' }
+                { id: 'ropa interior', label: 'Ropa Interior', icon: 'fa-solid fa-socks' }
             ],
             zapatos: [
                 { id: 'todos_zapatos', label: 'Todo Zapatos', icon: 'fa-solid fa-shoe-prints' },
-                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
-                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
-                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' }
+                { id: 'niños', label: 'Niños', icon: 'fa-solid fa-child' },
+                { id: 'dama', label: 'Damas', icon: 'fa-solid fa-person-dress' },
+                { id: 'caballero', label: 'Caballeros', icon: 'fa-solid fa-user-tie' }
             ],
             accesorios: [
                 { id: 'todos_accesorios', label: 'Todo Accesorios', icon: 'fa-solid fa-icons' },
                 { id: 'herramientas', label: 'Herramientas', icon: 'fa-solid fa-wrench' },
                 { id: 'electricidad', label: 'Electricidad', icon: 'fa-solid fa-bolt' },
-                { id: 'mecanica', label: 'Mecánica', icon: 'fa-solid fa-gears' },
-                { id: 'bolsas_mochilas', label: 'Bolsas y Mochilas', icon: 'fa-solid fa-bag-shopping' },
-                { id: 'tecnologia', label: 'Tecnología', icon: 'fa-solid fa-mobile-screen' },
+                { id: 'mecánica', label: 'Mecánica', icon: 'fa-solid fa-gears' },
+                { id: 'bolsas y mochilas', label: 'Bolsas y Mochilas', icon: 'fa-solid fa-bag-shopping' },
+                { id: 'tecnología', label: 'Tecnología', icon: 'fa-solid fa-mobile-screen' },
                 { id: 'belleza', label: 'Belleza', icon: 'fa-solid fa-wand-magic-sparkles' }
             ]
         };
@@ -553,8 +553,7 @@ function filterCategory(cat) {
             currentSubcategory = subId;
             applyFilters();
         }
-
-       function applyFilters() {
+function applyFilters() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
 
@@ -565,14 +564,13 @@ function filterCategory(cat) {
                 if (currentCategory === 'ofertas') {
                     matchCat = p.oldPrice > p.price;
                 } else if (currentCategory !== 'todos') {
-                    // Comparamos de forma exacta o flexible la categoría principal
-                    matchCat = p.category === currentCategory || p.category.includes(currentCategory);
+                    // Compara ignorando diferencias de mayúsculas y acentos básicos
+                    matchCat = p.category.trim().toLowerCase() === currentCategory.trim().toLowerCase();
                 }
 
                 let matchSub = true;
-                // Solo filtramos por subcategoría si el usuario seleccionó una específica (que no sea "todos" ni empiece con "todos_")
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
-                    matchSub = p.subcategory === currentSubcategory || p.subcategory.includes(currentSubcategory);
+                    matchSub = p.subcategory.trim().toLowerCase() === currentSubcategory.trim().toLowerCase();
                 }
 
                 return matchSearch && matchCat && matchSub;
