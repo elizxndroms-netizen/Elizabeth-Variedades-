@@ -524,10 +524,9 @@
                     </div>`;
             }).join('');
         }
-
-        function filterCategory(cat) {
+function filterCategory(cat) {
             currentCategory = cat;
-            currentSubcategory = 'todos';
+            currentSubcategory = 'todos'; // Resetea a todos para que no oculte los productos
 
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap';
@@ -550,26 +549,30 @@
 
             applyFilters();
         }
-
         function filterSubcategory(subId) {
             currentSubcategory = subId;
             applyFilters();
         }
 
-        function applyFilters() {
+       function applyFilters() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
 
             let filtered = products.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search);
+                
                 let matchCat = true;
-
-                if (currentCategory === 'ofertas') matchCat = p.oldPrice > p.price;
-                else if (currentCategory !== 'todos') matchCat = p.category.includes(currentCategory);
+                if (currentCategory === 'ofertas') {
+                    matchCat = p.oldPrice > p.price;
+                } else if (currentCategory !== 'todos') {
+                    // Comparamos de forma exacta o flexible la categoría principal
+                    matchCat = p.category === currentCategory || p.category.includes(currentCategory);
+                }
 
                 let matchSub = true;
+                // Solo filtramos por subcategoría si el usuario seleccionó una específica (que no sea "todos" ni empiece con "todos_")
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
-                    matchSub = p.subcategory.includes(currentSubcategory);
+                    matchSub = p.subcategory === currentSubcategory || p.subcategory.includes(currentSubcategory);
                 }
 
                 return matchSearch && matchCat && matchSub;
@@ -581,7 +584,6 @@
 
             renderProducts(filtered);
         }
-
         function openProductModal(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
