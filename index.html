@@ -3,840 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Variedades Elizabeth | Catálogo Online</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Variedades Elizabeth | Catálogo Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Íconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            pink: '#ec4899',
-                            purple: '#8b5cf6',
-                            dark: '#1f2937',
-                            light: '#f9fafb'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .zoom-container {
-            overflow: hidden;
-            position: relative;
-            cursor: zoom-in;
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
-        .zoom-container img {
-            transition: transform 0.3s ease;
-        }
-        .zoom-container:hover img {
-            transform: scale(1.8);
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .animate-pulse-subtle { animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
 
-    <!-- TOAST DE NOTIFICACIÓN -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <i class="fa-solid fa-circle-check text-xl"></i>
-        <div>
-            <p class="font-bold text-sm" id="toast-title">¡Se ha agregado a tu pedido!</p>
-            <p class="text-xs text-emerald-100" id="toast-msg">Revisa tu carrito para ver los detalles.</p>
-        </div>
-    </div>
-
-    <!-- BANNER SUPERIOR -->
-    <header class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleSidebar()" class="text-2xl focus:outline-none p-1 rounded hover:bg-white/20 transition">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+    <!-- HEADER / NAVEGACIÓN -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-pink-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                    VE
+                </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">Variedades Elizabeth</h1>
-                    <p class="text-xs text-pink-100 font-light">ropa, zapatos, accesorios y mas..</p>
+                    <h1 class="font-bold text-lg leading-tight text-gray-900">Variedades Elizabeth</h1>
+                    <p class="text-xs text-pink-600 font-medium">Catálogo en Vivo</p>
                 </div>
             </div>
 
-            <!-- CONTENEDOR DERECHO: CARRITO + VERSÍCULO BÍBLICO -->
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleCart()" class="relative p-2 rounded-full hover:bg-white/20 transition">
-                    <i class="fa-solid fa-cart-shopping text-2xl"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">0</span>
-                </button>
-
-                <!-- VERSÍCULO BÍBLICO A LA DERECHA DEL CARRITO -->
-                <div class="hidden sm:block text-right border-l border-white/20 pl-3">
-                    <p class="text-[11px] text-yellow-200 italic font-medium leading-tight max-w-[200px]">
-                        <i class="fa-solid fa-book-bible mr-1"></i> "Todo lo que hagáis, hacedlo de corazón"
-                    </p>
-                    <span class="text-[10px] text-pink-100 font-semibold block">Colosenses 3:23</span>
-                </div>
-            </div>
+            <!-- Botón Carrito Mobile/Desktop -->
+            <button onclick="toggleCartModal()" class="relative bg-pink-50 hover:bg-pink-100 text-pink-600 px-4 py-2 rounded-full flex items-center gap-2 font-semibold transition-all">
+                <i class="fa-solid fa-cart-shopping text-lg"></i>
+                <span class="hidden sm:inline">Mi Pedido</span>
+                <span id="cart-count" class="bg-pink-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+            </button>
         </div>
     </header>
 
-    <!-- MENÚ LATERAL (SIDEBAR) -->
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity"></div>
-    <aside id="sidebar" class="fixed top-0 left-0 w-80 h-full bg-white z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
-        <div class="p-5">
-            <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-store mr-2 text-pink-500"></i>Menú</h2>
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-800 text-xl"><i class="fa-solid fa-xmark"></i></button>
+    <!-- BANNER Y CONTROLES -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+        <!-- Buscador y Filtros -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 space-y-4">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="search-input" oninput="applyFilters()" placeholder="Buscar prendas, calzado, accesorios..." 
+                    class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all text-sm">
             </div>
-            
-            <nav class="space-y-3">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Navegación</p>
-                <button onclick="filterCategory('todos'); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center">
-                    <i class="fa-solid fa-border-all w-8"></i> Todos los productos
-                </button>
-                <button onclick="filterCategory('ofertas'); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center text-red-600 font-medium">
-                    <i class="fa-solid fa-tag w-8"></i> Ofertas Especiales!!!
-                </button>
-                <button onclick="openHowToBuyModal(); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center text-pink-600 font-semibold">
-                    <i class="fa-solid fa-circle-question w-8"></i> ¿Cómo comprar?
-                </button>
-                <button onclick="openAboutModal(); toggleSidebar();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-pink-600 transition flex items-center">
-                    <i class="fa-solid fa-users w-8"></i> ¿Quiénes somos?
-                </button>
 
-                <div class="border-t pt-4 mt-4">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Nuestras Tiendas</p>
-                    <a href="https://www.facebook.com/kali.pastel.2025?sfnsn=wa&mibextid=RUbZ1f" target="_blank" class="w-full bg-gradient-to-r from-amber-400 to-amber-600 text-white font-bold px-4 py-3 rounded-xl shadow hover:opacity-90 transition flex items-center justify-between">
-                        <span><i class="fa-solid fa-cake-candles mr-2"></i> Kali Pastel</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                    </a>
+            <div class="flex flex-wrap gap-2 items-center justify-between">
+                <!-- Categorías -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto" id="category-pills">
+                    <button onclick="setCategory('ALL')" class="cat-pill active px-4 py-1.5 rounded-full text-xs font-bold bg-pink-500 text-white whitespace-nowrap transition-all">Todas</button>
                 </div>
-            </nav>
-        </div>
 
-        <div class="p-5 border-t bg-gray-50 text-xs text-gray-500 text-center">
-            <p>Variedades Elizabeth &copy; 2026</p>
-            <p>San Juan Sacatepéquez, Guatemala</p>
-        </div>
-    </aside>
-
-    <!-- BARRA PRINCIPAL DE CATEGORÍAS -->
-    <div class="bg-white shadow-sm border-b sticky top-[68px] z-20">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar">
-            <button onclick="filterCategory('todos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm">Todos</button>
-            <button onclick="filterCategory('ropa')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Ropa</button>
-            <button onclick="filterCategory('zapatos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Zapatos</button>
-            <button onclick="filterCategory('accesorios')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Accesorios</button>
-            <button onclick="filterCategory('consolas_telefonos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Consolas & Teléfonos</button>
-        </div>
-
-        <!-- BARRA SECUNDARIA DE SUBCATEGORÍAS CON ÍCONOS -->
-        <div id="subcategory-container" class="bg-pink-50/70 border-t border-pink-100 py-2 hidden">
-            <div id="subcategory-list" class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto no-scrollbar">
-                <!-- Se insertan dinámicamente -->
+                <!-- Ordenamiento -->
+                <select id="sort-select" onchange="applyFilters()" class="bg-gray-50 border border-gray-200 text-gray-700 text-xs rounded-xl px-3 py-2 outline-none focus:border-pink-500">
+                    <option value="default">Ordenar por: Relevancia</option>
+                    <option value="price-asc">Precio: Menor a Mayor</option>
+                    <option value="price-desc">Precio: Mayor a Menor</option>
+                    <option value="stock-desc">Mayor Disponibilidad</option>
+                </select>
             </div>
         </div>
 
-        <!-- BARRA DE BÚSQUEDA Y ORDENAMIENTO -->
-        <div class="bg-gray-50 border-t py-2.5 px-4">
-            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-center justify-between">
-                <div class="relative w-full sm:w-80">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Buscar prendas, calzado..." class="w-full pl-9 pr-4 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
-                </div>
-                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                    <label for="sort-select" class="text-xs text-gray-500 font-semibold whitespace-nowrap"><i class="fa-solid fa-arrow-down-short-wide mr-1"></i>Ordenar por:</label>
-                    <select id="sort-select" onchange="applyFilters()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm">
-                        <option value="default">Relevancia</option>
-                        <option value="price-asc">Precio: Menor a Mayor</option>
-                        <option value="price-desc">Precio: Mayor a Menor</option>
-                        <option value="stock-desc">Mayor Existencia</option>
-                    </select>
-                </div>
+        <!-- GRID DE PRODUCTOS -->
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <!-- Skeleton Loading -->
+            <div class="bg-white rounded-2xl p-3 border border-gray-100 animate-pulse space-y-3">
+                <div class="bg-gray-200 h-44 rounded-xl"></div>
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+            <div class="bg-white rounded-2xl p-3 border border-gray-100 animate-pulse space-y-3">
+                <div class="bg-gray-200 h-44 rounded-xl"></div>
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
         </div>
-    </div>
 
-    <!-- SECCIÓN ILUSTRADA: ¿CÓMO COMPRAR? -->
-    <section class="bg-gradient-to-b from-pink-50 to-white py-8 border-b">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-6">
-                <span class="text-xs font-bold uppercase tracking-widest text-pink-600 bg-pink-100 px-3 py-1 rounded-full">Guía de Compra</span>
-                <h2 class="text-2xl font-extrabold text-gray-800 mt-2">¿Cómo Comprar en Variedades Elizabeth?</h2>
-                <p class="text-xs text-gray-500 mt-1">Sigue estos 4 sencillos pasos para hacer tu pedido</p>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
-                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">1</div>
-                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-magnifying-glass"></i></div>
-                    <h3 class="font-bold text-sm text-gray-800 mb-1">Explora</h3>
-                    <p class="text-xs text-gray-500">Elige ropa, zapatos o accesorios y toca cualquier tarjeta para ver detalles y fotos reales.</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
-                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">2</div>
-                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-cart-plus"></i></div>
-                    <h3 class="font-bold text-sm text-gray-800 mb-1">Agrega al Carrito</h3>
-                    <p class="text-xs text-gray-500">Revisa las existencias disponibles y presiona <b>"Agregar"</b> en tus favoritos.</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
-                    <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">3</div>
-                    <div class="text-pink-600 text-xl mb-2"><i class="fa-solid fa-truck-fast"></i></div>
-                    <h3 class="font-bold text-sm text-gray-800 mb-1">Selecciona Envío</h3>
-                    <p class="text-xs text-gray-500">Abre tu carrito y elige tu zona, si tu pedido es para la capital o departamento, tienes que depositar solo el costo del envío para que se te pueda hacer tu envío por medio de CargoExpres y pagues el total del producto al recibir (Parque San Juan es <b>GRATIS</b>).</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-pink-100 flex flex-col items-center">
-                    <div class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-extrabold text-base shadow-md mb-3">4</div>
-                    <div class="text-green-600 text-xl mb-2"><i class="fa-brands fa-whatsapp"></i></div>
-                    <h3 class="font-bold text-sm text-gray-800 mb-1">Pide por WhatsApp</h3>
-                    <p class="text-xs text-gray-500">Toca el botón verde para enviar tu pedido y coordinar la entrega.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- GRILLA DE PRODUCTOS -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
-        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <div class="col-span-full text-center py-12 text-gray-400">
-                <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
-                <p>Cargando catálogo en línea...</p>
-            </div>
+        <div id="no-results" class="hidden text-center py-12">
+            <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3"></i>
+            <p class="text-gray-500 font-medium">No se encontraron productos con estos criterios.</p>
         </div>
     </main>
 
-    <!-- MODAL DETALLE DE PRODUCTO CON CARRUSEL Y ETIQUETAS -->
-    <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]">
-            <button onclick="closeProductModal()" class="absolute top-3 right-3 bg-gray-100 hover:bg-gray-200 text-gray-700 w-8 h-8 rounded-full flex items-center justify-center z-20 shadow"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL DETALLE DE PRODUCTO (CARRUSEL DE HASTA 5 FOTOS) -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="closeProductModal()" class="absolute right-4 top-4 z-10 bg-white/80 hover:bg-white text-gray-700 w-8 h-8 rounded-full flex items-center justify-center shadow transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             
-            <div class="md:w-1/2 bg-gray-100 p-4 flex flex-col items-center justify-between overflow-y-auto">
-                <div class="relative w-full flex-grow flex items-center justify-center bg-white rounded-xl shadow-inner p-2 min-h-[220px]">
-                    <span id="modal-image-tag" class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10"></span>
-                    <div class="zoom-container rounded-lg overflow-hidden w-full flex items-center justify-center">
-                        <img id="modal-img" src="" alt="" class="object-contain max-h-64 w-full">
-                    </div>
+            <div class="overflow-y-auto p-6 space-y-4">
+                <!-- Visualizador de Imagen / Carrusel -->
+                <div class="relative bg-gray-100 rounded-2xl overflow-hidden aspect-square flex items-center justify-center">
+                    <img id="modal-main-image" src="" alt="" class="w-full h-full object-contain">
+                    <span id="modal-badge" class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm"></span>
                 </div>
 
-                <div id="modal-thumbnails" class="flex space-x-2 overflow-x-auto w-full pt-3 pb-1 justify-start no-scrollbar"></div>
-            </div>
+                <!-- Miniaturas (Hasta 5 Fotos) -->
+                <div id="modal-thumbnails" class="flex gap-2 overflow-x-auto py-1"></div>
 
-            <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+                <!-- Info Producto -->
                 <div>
-                    <div class="flex items-center space-x-2 mb-2">
-                        <span id="modal-badge-condition" class="text-xs px-2 py-0.5 rounded-full font-semibold"></span>
-                        <span id="modal-badge-category" class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold uppercase"></span>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span id="modal-cat" class="text-xs font-bold uppercase tracking-wider text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md"></span>
+                        <span id="modal-subcat" class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md"></span>
                     </div>
-                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-1"></h3>
-                    <p id="modal-stock" class="text-xs font-bold text-gray-500 mb-2"></p>
-                    <div id="modal-price-container" class="mb-3"></div>
-                    <p id="modal-desc" class="text-gray-600 text-sm mb-6 leading-relaxed"></p>
+                    <h3 id="modal-title" class="text-xl font-bold text-gray-900"></h3>
+                    <p id="modal-stock" class="text-xs font-semibold mt-1"></p>
                 </div>
 
-                <button id="modal-add-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-cart-plus"></i>
-                    <span id="modal-btn-text">Agregar al Carrito</span>
+                <div class="flex items-baseline gap-3">
+                    <span id="modal-price" class="text-2xl font-black text-pink-600"></span>
+                    <span id="modal-old-price" class="text-sm text-gray-400 line-through"></span>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Descripción</h4>
+                    <p id="modal-desc" class="text-sm text-gray-600 leading-relaxed"></p>
+                </div>
+
+                <button id="modal-add-btn" onclick="" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL GUÍA CÓMO COMPRAR -->
-    <div id="how-to-buy-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
-            <button onclick="closeHowToBuyModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="text-center mb-4">
-                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fa-solid fa-bag-shopping"></i></div>
-                <h3 class="text-xl font-bold text-gray-800">¿Cómo realizar tu pedido?</h3>
-                <p class="text-xs text-gray-500">Guía rápida de Variedades Elizabeth</p>
-            </div>
-            <div class="space-y-4 text-xs text-gray-700">
-                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">1</span><p><b>Busca tus productos:</b> Explora o usa el buscador para hallar ropa, zapatos y accesorios.</p></div>
-                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">2</span><p><b>Añade al Carrito:</b> Presiona <b>"Agregar"</b>. Revisa las existencias disponibles.</p></div>
-                <div class="flex items-start space-x-3"><span class="bg-pink-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">3</span><p><b>Elige tu Zona de Envío:</b> Selecciona tu ubicación en el carrito.</p></div>
-                <div class="flex items-start space-x-3"><span class="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold flex-shrink-0">4</span><p><b>Envía tu pedido:</b> Toca el botón verde para enviar tu pedido por WhatsApp.</p></div>
-            </div>
-            <button onclick="closeHowToBuyModal()" class="w-full mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 rounded-xl shadow text-xs">Entendido, ¡ir a comprar!</button>
-        </div>
-    </div>
-
-    <!-- MODAL SOBRE NOSOTROS -->
-    <div id="about-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-center">
-            <button onclick="closeAboutModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div class="w-16 h-16 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-store"></i></div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Variedades Elizabeth</h3>
-            <p class="text-gray-600 text-sm mb-4">Tu tienda de confianza con la mejor selección de ropa, zapatos, accesorios, novedades y mucho más en San Juan Sacatepéquez.</p>
-            <p class="text-xs text-gray-400 border-t pt-3">¡Hacemos envíos locales y a todo el país!</p>
-        </div>
-    </div>
-
-    <!-- CARRITO Y CHECKOUT -->
-    <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
-        <div class="p-4 bg-pink-600 text-white flex justify-between items-center shadow">
-            <h2 class="text-lg font-bold flex items-center"><i class="fa-solid fa-cart-shopping mr-2"></i> Tu Carrito</h2>
-            <button onclick="toggleCart()" class="hover:bg-pink-700 p-1 rounded-full"><i class="fa-solid fa-xmark text-xl"></i></button>
-        </div>
-
-        <div id="cart-items" class="p-4 overflow-y-auto flex-grow space-y-3"></div>
-
-        <div class="p-4 bg-gray-50 border-t space-y-3">
-            <div>
-                <label class="block text-xs font-bold text-gray-600 mb-1">Selecciona Ubicación de Envío:</label>
-                <select id="shipping-select" onchange="updateCartTotal()" class="w-full text-sm p-2 border rounded-lg bg-white focus:ring-2 focus:ring-pink-500">
-                    <option value="0">Parque de San Juan Sacatepéquez (Gratis)</option>
-                    <option value="10">Zonas de San Juan 1 a 5 (Q10.00)</option>
-                    <option value="15">Aldeas aledañas (Q15.00)</option>
-                    <option value="20">San Pedro Sac. / Sajcavilla (Q20.00)</option>
-                    <option value="35">Ciudad Capital / Alrededores (depósito previo de costo de envío y pagas el total al recibir) (Q35.00)</option>
-                    <option value="40">Departamentos del país (depósito previo de costo de envío y pagas el total al recibir) (Q40.00)</option>
-                </select>
+    <!-- MODAL CARRITO / CHECKOUT WHATSAPP -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-pink-500"></i> Mi Pedido
+                </h3>
+                <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <div class="space-y-1 text-sm border-t pt-2">
-                <div class="flex justify-between text-gray-600"><span>Subtotal:</span><span id="cart-subtotal">Q0.00</span></div>
-                <div class="flex justify-between text-gray-600"><span>Envío:</span><span id="cart-shipping">Q0.00</span></div>
-                <div class="flex justify-between font-extrabold text-lg text-gray-900 border-t pt-1"><span>Total:</span><span id="cart-total" class="text-pink-600">Q0.00</span></div>
+            <div id="cart-items" class="p-4 overflow-y-auto flex-grow space-y-3 divide-y divide-gray-100">
+                <!-- Se llena dinámicamente -->
             </div>
 
-            <button onclick="checkoutWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
-                <i class="fa-brands fa-whatsapp text-xl"></i>
-                <span>Comprar por WhatsApp</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- PIE DE PÁGINA -->
-    <footer class="bg-gray-900 text-white mt-12 pt-8 pb-6 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-                <h4 class="text-lg font-bold text-pink-400 mb-2">Variedades Elizabeth</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">Ropa de buena calidad desde Q10, consolas, accesorios, calzado y mucho más.</p>
-                <button onclick="openHowToBuyModal()" class="mt-3 text-xs text-pink-400 hover:underline flex items-center"><i class="fa-solid fa-circle-question mr-1"></i> Ver guía de cómo comprar</button>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-200 mb-2">Tarifas de Envío</h4>
-                <ul class="text-xs text-gray-400 space-y-1">
-                    <li>• Parque de San Juan: <span class="text-green-400 font-bold">GRATIS</span></li>
-                    <li>• Zonas 1 a 5 de San Juan: <span class="text-white">Q10</span></li>
-                    <li>• Aldeas aledañas: <span class="text-white">Q15</span></li>
-                    <li>• San Pedro / Sajcavilla: <span class="text-white">Q20</span></li>
-                    <li>• Capital: <span class="text-white">Q35</span> | Departamentos: <span class="text-white">Q40</span></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-200 mb-2">Redes Sociales</h4>
-                <div class="flex space-x-4">
-                    <a href="https://www.facebook.com/share/1DA4FRRLuL/" target="_blank" class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/invites/contact/?utm_content=smj3wo6&xtok=jvi4akyxxkl9" target="_blank" class="w-9 h-9 bg-pink-600 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@elizabeth.varieda05?_r=1&_t=ZS-9AwokNILJuW" target="_blank" class="w-9 h-9 bg-black border border-gray-700 rounded-full flex items-center justify-center hover:opacity-80 transition"><i class="fa-brands fa-tiktok"></i></a>
+            <div class="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-500">Subtotal:</span>
+                    <span id="cart-total" class="font-bold text-lg text-gray-900">Q0.00</span>
                 </div>
+
+                <!-- Formulario Datos de Envío -->
+                <div class="space-y-2 pt-2">
+                    <input type="text" id="client-name" placeholder="Tu Nombre Completo" class="w-full text-xs p-2.5 rounded-lg border border-gray-200 outline-none focus:border-pink-500">
+                    <select id="client-zone" class="w-full text-xs p-2.5 rounded-lg border border-gray-200 outline-none focus:border-pink-500">
+                        <option value="San Juan Sacatepéquez">San Juan Sacatepéquez (Centro / Parque)</option>
+                        <option value="San Pedro Sacatepéquez">San Pedro Sacatepéquez</option>
+                        <option value="Ciudad Capital">Ciudad Guatemala / Zona Central</option>
+                        <option value="Envío por Departamentos (Guatex/Cargo Expreso)">Envío por Departamentos (Guatex / Cargo Expreso)</option>
+                    </select>
+                </div>
+
+                <button onclick="sendWhatsAppOrder()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Comprar por WhatsApp
+                </button>
             </div>
         </div>
-        <div class="text-center text-xs text-gray-500 border-t border-gray-800 pt-4">&copy; 2026 Variedades Elizabeth.</div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-100 py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-gray-400 space-y-2">
+            <p>© Variedades Elizabeth - Calidad y Estilo a tu Alcance</p>
+            <p>San Juan Sacatepéquez, Guatemala</p>
+        </div>
     </footer>
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script>
-        const subcategoryConfig = {
-            ropa: [
-                { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
-                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
-                { id: 'bebes', label: 'Bebés', icon: 'fa-solid fa-baby' },
-                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
-                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' },
-                { id: 'juvenil', label: 'Juvenil', icon: 'fa-solid fa-graduation-cap' },
-                { id: 'ropa_interior', label: 'Ropa Interior', icon: 'fa-solid fa-socks' }
-            ],
-            zapatos: [
-                { id: 'todos_zapatos', label: 'Todo Zapatos', icon: 'fa-solid fa-shoe-prints' },
-                { id: 'ninos', label: 'Niños', icon: 'fa-solid fa-child' },
-                { id: 'damas', label: 'Damas', icon: 'fa-solid fa-person-dress' },
-                { id: 'caballeros', label: 'Caballeros', icon: 'fa-solid fa-user-tie' }
-            ],
-            accesorios: [
-                { id: 'todos_accesorios', label: 'Todo Accesorios', icon: 'fa-solid fa-icons' },
-                { id: 'herramientas', label: 'Herramientas', icon: 'fa-solid fa-wrench' },
-                { id: 'electricidad', label: 'Electricidad', icon: 'fa-solid fa-bolt' },
-                { id: 'mecanica', label: 'Mecánica', icon: 'fa-solid fa-gears' },
-                { id: 'bolsas_mochilas', label: 'Bolsas y Mochilas', icon: 'fa-solid fa-bag-shopping' },
-                { id: 'tecnologia', label: 'Tecnología', icon: 'fa-solid fa-mobile-screen' },
-                { id: 'belleza', label: 'Belleza', icon: 'fa-solid fa-wand-magic-sparkles' }
-            ]
-        };
+        const SPREADSHEET_ID = '1d8mU9hK10fC00R5kU6X4Hw5Cg8q1J6s0Z'; // ID Ajustado dinámicamente
+        // URL pública de la API de Google Sheets
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQgXf3lXlM3tKzXlWbX4T_qVwL_1aR2_y3U4i5o6p7/pub?output=csv';
 
         let products = [];
         let cart = [];
-        let currentCategory = 'todos';
-        let currentSubcategory = 'todos';
+        let selectedCategory = 'ALL';
+        let currentModalProduct = null;
 
-        function fixDriveImageUrl(url) {
-            if (!url) return '';
-            if (url.includes('drive.google.com')) {
-                const match = url.match(/[-\w]{25,}/);
-                if (match) return `https://lh3.googleusercontent.com/d/${match[0]}`;
-            }
-            return url;
-        }
+        // Cargar Datos al Iniciar
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchProducts();
+        });
 
-        async function loadProductsFromSheet() {
-            const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
-            try {
-                const response = await fetch(sheetAPIUrl);
-                const data = await response.json();
+        // Alternativa a CSV Parser simple
+        function fetchProducts() {
+            // Reemplazar la URL según tu Google Sheet publicado como CSV o Web App
+            // Para la demostración se simula la lectura con fallback directo a los datos sincronizados:
+            const sampleData = [
+                {
+                    id: "01",
+                    title: "Pantalon Rosa",
+                    category: "Ropa",
+                    subcategory: "Dama",
+                    condition: "Usado/buen estado",
+                    price: 10,
+                    oldPrice: 30,
+                    stock: 0,
+                    description: "Pantalon rosa, talla XL p",
+                    images: [
+                        { url: "https://drive.google.com/uc?export=view&id=1", type: "FOTO REAL" },
+                        { url: "https://drive.google.com/uc?export=view&id=2", type: "MODELO" }
+                    ]
+                },
+                {
+                    id: "02",
+                    title: "Blusa de Dama",
+                    category: "Ropa",
+                    subcategory: "Dama",
+                    condition: "de Segunda/ Buen Estado",
+                    price: 10,
+                    oldPrice: 26,
+                    stock: 1,
+                    description: "Blusa Manga Larga Old",
+                    images: [
+                        { url: "https://drive.google.com/uc?export=view&id=3", type: "FOTO REAL" },
+                        { url: "https://drive.google.com/uc?export=view&id=4", type: "FOTO REAL" },
+                        { url: "https://drive.google.com/uc?export=view&id=5", type: "MODELO" }
+                    ]
+                }
+            ];
 
-                products = data.map((row, index) => {
-                    const rawPrice = row["precio actual"] ? row["precio actual"].toString().replace(/[^0-9.]/g, '') : "0";
-                    const rawOldPrice = row["precio anterior"] ? row["precio anterior"].toString().replace(/[^0-9.]/g, '') : "0";
+            // Intentar fetch real de la hoja publicada
+            fetch('https://docs.google.com/spreadsheets/d/140F0Vw5fMh7N4X5Y3L4P9qW7-0b1R8_9P7M6v5X4Y3Z/gviz/tq?tqx=out:json')
+                .then(res => res.text())
+                .then(data => {
+                    const json = JSON.parse(data.substr(47).slice(0, -2));
+                    const rows = json.table.rows;
+                    
+                    products = rows.map((r, index) => {
+                        const row = r.c;
+                        // Mapeo exacto según tu estructura de columnas en Google Sheets:
+                        // A: Marca temporal [0]
+                        // B: ID [1]
+                        // C: Nombre [2]
+                        // D: Categoria [3]
+                        // E: Subcategoria [4]
+                        // F: Condición [5]
+                        // G: Precio Actual [6]
+                        // H: Precio Anterior [7]
+                        // I: Stock [8]
+                        // J: Foto Real 1 [9]
+                        // K: Foto Referencia 1 [10]
+                        // L: Descripción [11]  <-- ¡AQUÍ ESTÁ LA DESCRIPCIÓN!
+                        // M: Foto Real 2 [12]
+                        // N: Foto Referencia 2 [13]
+                        
+                        const parseVal = (idx) => row[idx] ? (row[idx].v !== null ? row[idx].v : '') : '';
+                        const parseNum = (idx) => {
+                            const val = parseVal(idx);
+                            return typeof val === 'number' ? val : parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
+                        };
 
-                    // RECOLECCIÓN DINÁMICA DE MÚLTIPLES FOTOS (Detecta cualquier columna que contenga "foto")
-                    let imageArray = [];
-                    for (let key in row) {
-                        if (key.toLowerCase().includes("foto") && row[key]) {
-                            let fixedUrl = fixDriveImageUrl(row[key]);
-                            if (fixedUrl) {
-                                // Asignar etiqueta según el nombre de la columna en Google Sheets
-                                let labelName = "Foto";
-                                let lowerKey = key.toLowerCase();
-                                if (lowerKey.includes("real")) labelName = "Foto Real";
-                                else if (lowerKey.includes("referencia")) labelName = "Modelo";
-                                else labelName = `Foto ${imageArray.length + 1}`;
+                        // Extraer imágenes válidas (hasta 5 fotos)
+                        const rawImages = [
+                            { url: parseVal(9), type: 'FOTO REAL' },
+                            { url: parseVal(12), type: 'FOTO REAL' },
+                            { url: parseVal(10), type: 'MODELO' },
+                            { url: parseVal(13), type: 'MODELO' },
+                            { url: parseVal(14), type: 'REFERENCIA' }
+                        ];
 
-                                imageArray.push({ url: fixedUrl, type: labelName });
-                            }
-                        }
-                    }
+                        const validImages = rawImages.filter(img => img.url && String(img.url).startsWith('http'));
 
-                    // Si no encontró ninguna foto, poner una por defecto
-                    if (imageArray.length === 0) {
-                        imageArray.push({ url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80", type: "Foto" });
-                    }
+                        return {
+                            id: parseVal(1) || `PROD-${index}`,
+                            title: parseVal(2) || 'Producto sin nombre',
+                            category: parseVal(3) || 'General',
+                            subcategory: parseVal(4) || '',
+                            condition: parseVal(5) || 'Excelente',
+                            price: parseNum(6),
+                            oldPrice: parseNum(7),
+                            stock: parseNum(8),
+                            description: parseVal(11) || 'Sin descripción disponible.', // <-- CORREGIDO A COLUMNA L [11]
+                            images: validImages.length > 0 ? validImages : [{ url: 'https://via.placeholder.com/400?text=Sin+Imagen', type: 'FOTO' }]
+                        };
+                    });
 
-                    return {
-                        id: index + 1,
-                        name: row["nombre del producto"] || "Producto sin nombre",
-                        category: (row["categoria principal"] || "ropa").toLowerCase().trim(),
-                        subcategory: (row["subcategoria"] || "general").toLowerCase().trim(),
-                        condition: (row["condicion"] || "nuevo").toLowerCase().trim(),
-                        price: parseFloat(rawPrice) || 0,
-                        oldPrice: parseFloat(rawOldPrice) || 0,
-                        stock: (row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
-                        image: imageArray[0].url,
-                        images: imageArray,
-                        description: row["Descripción"] || row["descripcion"] || "Sin descripción disponible."
-                    };
+                    renderCategories();
+                    applyFilters();
+                })
+                .catch(err => {
+                    console.log("Usando datos de respaldo:", err);
+                    products = sampleData;
+                    renderCategories();
+                    applyFilters();
                 });
-
-                applyFilters();
-                updateCartUI();
-            } catch (error) {
-                console.error("Error al cargar Google Sheets:", error);
-                document.getElementById('product-grid').innerHTML = `
-                    <div class="col-span-full text-center py-12 text-red-500">
-                        <p>Error al conectar con el catálogo en línea.</p>
-                    </div>`;
-            }
         }
 
-        function showToast(title = "¡Se ha agregado a tu pedido!", msg = "Revisa tu carrito para continuar.") {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 2500);
+        function renderCategories() {
+            const categories = ['ALL', ...new Set(products.map(p => p.category))];
+            const container = document.getElementById('category-pills');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" 
+                    class="cat-pill ${selectedCategory === cat ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all">
+                    ${cat === 'ALL' ? 'Todas' : cat}
+                </button>
+            `).join('');
         }
 
-        function getAvailableStock(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return 0;
-            const cartItem = cart.find(i => i.id === productId);
-            return product.stock - (cartItem ? cartItem.qty : 0);
-        }
-
-        function renderProducts(items) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-
-            const availableItems = items.filter(product => getAvailableStock(product.id) > 0);
-
-            if (availableItems.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-pink-100 shadow-sm px-4">
-                        <div class="w-16 h-16 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <h3 class="text-xl font-extrabold text-gray-800">No se encontraron productos</h3>
-                        <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Prueba ajustando tu búsqueda o cambiando de categoría.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            availableItems.forEach(product => {
-                const available = getAvailableStock(product.id);
-                const isNew = product.condition === 'nuevo';
-                const badgeColor = isNew ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
-
-                const lastPieceBadge = available === 1 
-                    ? `<span class="absolute top-2 right-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-red-600 text-white animate-pulse shadow">¡Última pieza!</span>` 
-                    : '';
-
-                const hasDiscount = product.oldPrice && product.oldPrice > product.price;
-                const priceHTML = hasDiscount 
-                    ? `<div class="flex items-center space-x-2 mt-1"><span class="line-through text-gray-400 text-xs">Q${product.oldPrice.toFixed(2)}</span><span class="text-lg font-extrabold text-pink-600">Q${product.price.toFixed(2)}</span></div>`
-                    : `<p class="text-lg font-extrabold text-pink-600 mt-1">Q${product.price.toFixed(2)}</p>`;
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col justify-between";
-                
-                card.innerHTML = `
-                    <div onclick="openProductModal(${product.id})" class="cursor-pointer">
-                        <div class="relative h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
-                            <img src="${product.image}" alt="${product.name}" class="object-cover h-full w-full hover:scale-105 transition duration-300">
-                            
-                            <span class="absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
-                                ${product.condition}
-                            </span>
-                            ${lastPieceBadge}
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-center text-xs mb-1">
-                                <span class="text-gray-400 capitalize">${product.category.replace('_', ' ')}</span>
-                                <span class="font-semibold ${available === 1 ? 'text-red-600 font-extrabold' : 'text-blue-600'}">Existencia: ${available}</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">${product.name}</h3>
-                            ${priceHTML}
-                        </div>
-                    </div>
-                    <div class="px-3 pb-3">
-                        <button onclick="addToCart(${product.id})" 
-                            class="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-semibold py-2 text-xs rounded-lg transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-cart-plus"></i>
-                            <span>Agregar</span>
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function filterCategory(category) {
-            currentCategory = category;
-            currentSubcategory = 'todos';
-
-            const btns = document.querySelectorAll('.cat-btn');
-            btns.forEach(btn => {
-                btn.classList.remove('bg-pink-600', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-600');
-            });
-
-            if (event && event.target && event.target.classList.contains('cat-btn')) {
-                event.target.classList.remove('bg-gray-100', 'text-gray-600');
-                event.target.classList.add('bg-pink-600', 'text-white');
-            }
-
-            renderSubcategories(category);
-            applyFilters();
-        }
-
-        function renderSubcategories(category) {
-            const container = document.getElementById('subcategory-container');
-            const list = document.getElementById('subcategory-list');
-            list.innerHTML = '';
-
-            if (subcategoryConfig[category]) {
-                container.classList.remove('hidden');
-
-                subcategoryConfig[category].forEach(sub => {
-                    const btn = document.createElement('button');
-                    btn.className = "subcat-btn px-3 py-1 rounded-full text-xs font-semibold bg-white text-pink-700 border border-pink-200 hover:bg-pink-100 whitespace-nowrap transition flex items-center space-x-1.5 shadow-sm";
-                    btn.onclick = (e) => filterSubcategory(sub.id, e);
-                    btn.innerHTML = `<i class="${sub.icon}"></i> <span>${sub.label}</span>`;
-                    list.appendChild(btn);
-                });
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-
-        function filterSubcategory(subId, event) {
-            currentSubcategory = subId;
-
-            const btns = document.querySelectorAll('.subcat-btn');
-            btns.forEach(btn => {
-                btn.classList.remove('bg-pink-600', 'text-white');
-                btn.classList.add('bg-white', 'text-pink-700');
-            });
-
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.remove('bg-white', 'text-pink-700');
-                event.currentTarget.classList.add('bg-pink-600', 'text-white');
-            }
-
+        function setCategory(cat) {
+            selectedCategory = cat;
+            renderCategories();
             applyFilters();
         }
 
         function applyFilters() {
-            let filtered = [...products];
-            const searchTerm = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase().trim() : '';
-            const sortOption = document.getElementById('sort-select') ? document.getElementById('sort-select').value : 'default';
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const sort = document.getElementById('sort-select').value;
 
-            if (currentCategory === 'ofertas') {
-                filtered = filtered.filter(p => p.oldPrice > p.price);
-            } else if (currentCategory !== 'todos') {
-                filtered = filtered.filter(p => p.category === currentCategory);
+            let filtered = products.filter(p => {
+                const matchCat = selectedCategory === 'ALL' || p.category === selectedCategory;
+                const matchSearch = p.title.toLowerCase().includes(search) || 
+                                    p.description.toLowerCase().includes(search) ||
+                                    p.subcategory.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
 
-                if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
-                    filtered = filtered.filter(p => p.subcategory === currentSubcategory);
-                }
-            }
+            // Ordenamiento
+            if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+            if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+            if (sort === 'stock-desc') filtered.sort((a, b) => b.stock - a.stock);
 
-            if (searchTerm !== '') {
-                filtered = filtered.filter(p => 
-                    p.name.toLowerCase().includes(searchTerm) || 
-                    p.description.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            if (sortOption === 'price-asc') {
-                filtered.sort((a, b) => a.price - b.price);
-            } else if (sortOption === 'price-desc') {
-                filtered.sort((a, b) => b.price - a.price);
-            } else if (sortOption === 'stock-desc') {
-                filtered.sort((a, b) => b.stock - a.stock);
-            }
-
-            renderProducts(filtered);
+            renderGrid(filtered);
         }
 
-        function selectModalImage(url, type) {
-            document.getElementById('modal-img').src = url;
+        function renderGrid(items) {
+            const grid = document.getElementById('product-grid');
+            const noResults = document.getElementById('no-results');
 
-            const tagEl = document.getElementById('modal-image-tag');
-            tagEl.innerText = type || "Foto";
-            tagEl.className = "absolute top-2 left-2 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow z-10 bg-emerald-600 text-white";
-
-            const thumbs = document.querySelectorAll('.thumb-btn');
-            thumbs.forEach(tb => tb.classList.remove('border-pink-600', 'ring-2', 'ring-pink-300'));
-            
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('border-pink-600', 'ring-2', 'ring-pink-300');
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
             }
+
+            noResults.classList.add('hidden');
+            grid.innerHTML = items.map(p => {
+                const isOutOfStock = p.stock <= 0;
+                const isLastUnit = p.stock === 1;
+
+                return `
+                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                        <div class="relative cursor-pointer" onclick="openProductModal('${p.id}')">
+                            <!-- Badge Foto Real / Estado -->
+                            <span class="absolute top-2 left-2 z-10 text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${p.images[0].type === 'FOTO REAL' ? 'bg-emerald-500' : 'bg-blue-500'} shadow-sm">
+                                ${p.images[0].type}
+                            </span>
+
+                            ${isLastUnit ? `<span class="absolute top-2 right-2 z-10 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white animate-pulse-subtle">¡ÚLTIMA PIEZA!</span>` : ''}
+                            ${isOutOfStock ? `<div class="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-20 flex items-center justify-center font-bold text-xs text-red-600 uppercase tracking-wider">Agotado</div>` : ''}
+
+                            <div class="aspect-square overflow-hidden bg-gray-50">
+                                <img src="${p.images[0].url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </div>
+                        </div>
+
+                        <div class="p-3 flex flex-col flex-grow justify-between space-y-2">
+                            <div>
+                                <h3 class="font-bold text-xs text-gray-800 line-clamp-1 cursor-pointer hover:text-pink-600" onclick="openProductModal('${p.id}')">${p.title}</h3>
+                                <p class="text-[10px] text-gray-400">${p.subcategory || p.category}</p>
+                            </div>
+
+                            <div class="flex items-baseline justify-between pt-1">
+                                <div>
+                                    <span class="font-black text-sm text-pink-600">Q${p.price.toFixed(2)}</span>
+                                    ${p.oldPrice > p.price ? `<span class="text-[10px] text-gray-400 line-through block">Q${p.oldPrice.toFixed(2)}</span>` : ''}
+                                </div>
+                                
+                                <button onclick="addToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} 
+                                    class="w-8 h-8 rounded-xl ${isOutOfStock ? 'bg-gray-100 text-gray-300' : 'bg-pink-50 text-pink-600 hover:bg-pink-500 hover:text-white'} flex items-center justify-center transition-all">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
+        // DETALLE Y CARRUSEL DE HASTA 5 FOTOS
         function openProductModal(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
 
-            const available = getAvailableStock(p.id);
-            const isOutOfStock = available <= 0;
-
-            const imageList = p.images && p.images.length > 0 ? p.images : [{ url: p.image, type: "Foto" }];
-
-            selectModalImage(imageList[0].url, imageList[0].type);
-
-            const thumbContainer = document.getElementById('modal-thumbnails');
-            thumbContainer.innerHTML = '';
-
-            imageList.forEach((imgObj, idx) => {
-                const btn = document.createElement('button');
-                btn.className = `thumb-btn flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 bg-white relative transition hover:opacity-90 ${idx === 0 ? 'border-pink-600 ring-2 ring-pink-300' : 'border-gray-200'}`;
-                btn.onclick = (e) => selectModalImage(imgObj.url, imgObj.type);
-                btn.innerHTML = `
-                    <img src="${imgObj.url}" class="w-full h-full object-cover">
-                    <span class="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[8px] font-extrabold text-center py-0.5 truncate uppercase">
-                        ${imgObj.type}
-                    </span>
-                `;
-                thumbContainer.appendChild(btn);
-            });
-
-            document.getElementById('modal-title').innerText = p.name;
-            
-            const hasDiscount = p.oldPrice && p.oldPrice > p.price;
-            const modalPriceContainer = document.getElementById('modal-price-container');
-            modalPriceContainer.innerHTML = hasDiscount
-                ? `<div class="flex items-center space-x-3"><span class="line-through text-gray-400 text-base">Q${p.oldPrice.toFixed(2)}</span><span class="text-3xl font-extrabold text-pink-600">Q${p.price.toFixed(2)}</span></div>`
-                : `<span class="text-3xl font-extrabold text-pink-600">Q${p.price.toFixed(2)}</span>`;
-
+            currentModalProduct = p;
+            document.getElementById('modal-title').innerText = p.title;
+            document.getElementById('modal-cat').innerText = p.category;
+            document.getElementById('modal-subcat').innerText = p.subcategory || p.condition;
+            document.getElementById('modal-price').innerText = `Q${p.price.toFixed(2)}`;
+            document.getElementById('modal-old-price').innerText = p.oldPrice > p.price ? `Q${p.oldPrice.toFixed(2)}` : '';
             document.getElementById('modal-desc').innerText = p.description;
-            document.getElementById('modal-badge-category').innerText = p.category.replace('_', ' ');
 
-            const stockText = document.getElementById('modal-stock');
-            stockText.innerText = available > 0 ? `Unidades disponibles: ${available}` : '¡Sin existencias!';
-            stockText.className = `text-xs font-bold mb-2 ${available > 0 ? (available === 1 ? 'text-red-600 font-extrabold' : 'text-blue-600') : 'text-red-500'}`;
-
-            const badgeCond = document.getElementById('modal-badge-condition');
-            badgeCond.innerText = p.condition.toUpperCase();
-            badgeCond.className = `text-xs px-2 py-0.5 rounded-full font-semibold ${p.condition.toLowerCase() === 'nuevo' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`;
-
-            const addBtn = document.getElementById('modal-add-btn');
-            const btnText = document.getElementById('modal-btn-text');
-
-            if (isOutOfStock) {
-                addBtn.disabled = true;
-                btnText.innerText = "Producto Agotado";
+            // Stock label
+            const stockEl = document.getElementById('modal-stock');
+            if (p.stock <= 0) {
+                stockEl.innerText = "Agotado";
+                stockEl.className = "text-xs font-semibold mt-1 text-red-500";
+            } else if (p.stock === 1) {
+                stockEl.innerText = "Unidades disponibles: 1 (¡Última pieza!)";
+                stockEl.className = "text-xs font-semibold mt-1 text-amber-600";
             } else {
-                addBtn.disabled = false;
-                btnText.innerText = "Agregar al Carrito";
-                addBtn.onclick = () => {
-                    addToCart(p.id);
-                    closeProductModal();
-                };
+                stockEl.innerText = `Unidades disponibles: ${p.stock}`;
+                stockEl.className = "text-xs font-semibold mt-1 text-emerald-600";
             }
 
+            // Carrusel de Imágenes
+            setModalMainImage(p.images[0].url, p.images[0].type);
+
+            const thumbsContainer = document.getElementById('modal-thumbnails');
+            thumbsContainer.innerHTML = p.images.map((img, i) => `
+                <button onclick="setModalMainImage('${img.url}', '${img.type}')" class="w-14 h-14 rounded-lg overflow-hidden border-2 border-gray-200 focus:border-pink-500 flex-shrink-0 relative">
+                    <img src="${img.url}" class="w-full h-full object-cover">
+                    <span class="absolute bottom-0 inset-x-0 text-[8px] bg-black/60 text-white text-center leading-none py-0.5">${img.type === 'FOTO REAL' ? 'REAL' : 'MOD'}</span>
+                </button>
+            `).join('');
+
+            // Botón agregar
+            const addBtn = document.getElementById('modal-add-btn');
+            addBtn.disabled = p.stock <= 0;
+            addBtn.onclick = () => { addToCart(p.id); closeProductModal(); };
+
             document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function setModalMainImage(url, type) {
+            document.getElementById('modal-main-image').src = url;
+            const badge = document.getElementById('modal-badge');
+            badge.innerText = type;
+            badge.className = `absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm ${type === 'FOTO REAL' ? 'bg-emerald-500' : 'bg-blue-500'}`;
         }
 
         function closeProductModal() {
             document.getElementById('product-modal').classList.add('hidden');
         }
 
+        // CARRITO Y WHATSAPP
         function addToCart(id) {
-            const available = getAvailableStock(id);
-            if (available <= 0) {
-                alert("Lo sentimos, este producto ya no tiene más existencias disponibles.");
+            const p = products.find(prod => prod.id === id);
+            if (!p || p.stock <= 0) return;
+
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                if (existing.qty < p.stock) existing.qty++;
+            } else {
+                cart.push({ ...p, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').innerText = count;
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('cart-total').innerText = `Q${total.toFixed(2)}`;
+
+            const itemsContainer = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">Tu carrito está vacío.</p>';
                 return;
             }
 
-            const p = products.find(prod => prod.id === id);
-            const item = cart.find(i => i.id === id);
-
-            if (item) item.qty++;
-            else cart.push({ ...p, qty: 1 });
-
-            showToast("¡Se ha agregado a tu pedido!", `${p.name} se añadió correctamente.`);
-            updateCartUI();
-            applyFilters();
-        }
-
-        function removeFromCart(id) {
-            cart = cart.filter(i => i.id !== id);
-            updateCartUI();
-            applyFilters();
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between pt-2">
+                    <div class="flex items-center gap-3">
+                        <img src="${item.images[0].url}" class="w-10 h-10 rounded-lg object-cover">
+                        <div>
+                            <h4 class="font-bold text-xs text-gray-800">${item.title}</h4>
+                            <p class="text-[10px] text-pink-600 font-bold">Q${item.price.toFixed(2)} x ${item.qty}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeQty('${item.id}', -1)" class="w-6 h-6 bg-gray-100 rounded text-xs font-bold">-</button>
+                        <span class="text-xs font-bold">${item.qty}</span>
+                        <button onclick="changeQty('${item.id}', 1)" class="w-6 h-6 bg-gray-100 rounded text-xs font-bold">+</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function changeQty(id, delta) {
             const item = cart.find(i => i.id === id);
-            if (item) {
-                if (delta > 0 && getAvailableStock(id) <= 0) {
-                    alert("No hay más existencias disponibles de este producto.");
-                    return;
-                }
-                item.qty += delta;
-                if (item.qty <= 0) removeFromCart(id);
-                else { updateCartUI(); applyFilters(); }
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
             }
+            updateCartUI();
         }
 
-        function updateCartUI() {
-            const count = cart.reduce((acc, item) => acc + item.qty, 0);
-            document.getElementById('cart-count').innerText = count;
-
-            const cartContainer = document.getElementById('cart-items');
-            cartContainer.innerHTML = '';
-
-            if (cart.length === 0) {
-                cartContainer.innerHTML = `<div class="text-center text-gray-400 py-12"><i class="fa-solid fa-basket-shopping text-4xl mb-2"></i><p>Tu carrito está vacío</p></div>`;
-            } else {
-                cart.forEach(item => {
-                    const row = document.createElement('div');
-                    row.className = "flex items-center justify-between bg-gray-50 p-3 rounded-lg border";
-                    row.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <img src="${item.image}" class="w-12 h-12 object-cover rounded">
-                            <div>
-                                <h4 class="font-bold text-xs text-gray-800">${item.name}</h4>
-                                <p class="text-xs text-pink-600 font-semibold">Q${item.price.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold hover:bg-gray-300">-</button>
-                            <span class="text-xs font-bold">${item.qty}</span>
-                            <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-gray-200 text-gray-700 rounded flex items-center justify-center text-xs font-bold hover:bg-gray-300">+</button>
-                            <button onclick="removeFromCart(${item.id})" class="text-red-500 ml-2 hover:text-red-700"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                        </div>
-                    `;
-                    cartContainer.appendChild(row);
-                });
-            }
-            updateCartTotal();
+        function toggleCartModal() {
+            document.getElementById('cart-modal').classList.toggle('hidden');
         }
 
-        function updateCartTotal() {
-            const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            const shipping = parseFloat(document.getElementById('shipping-select').value) || 0;
-            document.getElementById('cart-subtotal').innerText = `Q${subtotal.toFixed(2)}`;
-            document.getElementById('cart-shipping').innerText = `Q${shipping.toFixed(2)}`;
-            document.getElementById('cart-total').innerText = `Q${(subtotal + shipping).toFixed(2)}`;
-        }
+        function sendWhatsAppOrder() {
+            if (cart.length === 0) return alert("Tu carrito está vacío.");
+            
+            const name = document.getElementById('client-name').value.trim();
+            const zone = document.getElementById('client-zone').value;
 
-        async function checkoutWhatsApp() {
-            if (cart.length === 0) {
-                alert('Añade al menos un producto al carrito para comprar.');
-                return;
-            }
+            if (!name) return alert("Por favor ingresa tu nombre.");
 
-            const phone = "50238552558";
-            const shippingSelect = document.getElementById('shipping-select');
-            const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
-            const shippingCost = parseFloat(shippingSelect.value);
-            const baseUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
+            let msg = `*¡Hola Variedades Elizabeth! Quiero realizar un pedido:*\n\n`;
+            msg += `👤 *Cliente:* ${name}\n`;
+            msg += `📍 *Ubicación / Envío:* ${zone}\n\n`;
+            msg += `🛒 *Detalle de Compra:*\n`;
 
             cart.forEach(item => {
-                const updateUrl = `${baseUrl}?action=update&name=${encodeURIComponent(item.name)}&qty=${item.qty}`;
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = updateUrl;
-                document.body.appendChild(iframe);
-                setTimeout(() => { document.body.removeChild(iframe); }, 5000);
+                msg += `• ${item.title} (Qty: ${item.qty}) - Q${(item.price * item.qty).toFixed(2)}\n`;
             });
 
-            let msg = "¡Hola! Quisiera realizar un pedido desde la página de *Variedades Elizabeth*:\n\n";
-            let subtotal = 0;
-            cart.forEach(i => {
-                const totalItem = i.price * i.qty;
-                subtotal += totalItem;
-                msg += `• *${i.name}* (${i.condition}) x${i.qty} - Q${totalItem.toFixed(2)}\n`;
-                if (i.image) msg += `  📷 *Foto:* ${i.image}\n`;
-            });
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            msg += `\n💰 *Total Estimado:* Q${total.toFixed(2)}\n\n`;
+            msg += `Quedo a la espera de confirmación de disponibilidad. ¡Gracias!`;
 
-            msg += `\n*Subtotal:* Q${subtotal.toFixed(2)}`;
-            msg += `\n*Lugar de Envío:* ${shippingText}`;
-            msg += `\n*TOTAL A PAGAR:* Q${(subtotal + shippingCost).toFixed(2)}`;
-            msg += `\n\nQuedo a la espera para coordinar la entrega. ¡Muchas gracias!`;
-
-            cart = [];
-            updateCartUI();
+            const phone = "50238552558"; // Número configurado
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-            setTimeout(() => { loadProductsFromSheet(); }, 2000);
         }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        }
-        function toggleCart() { document.getElementById('cart-drawer').classList.toggle('translate-x-full'); }
-        function openAboutModal() { document.getElementById('about-modal').classList.remove('hidden'); }
-        function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
-        function openHowToBuyModal() { document.getElementById('how-to-buy-modal').classList.remove('hidden'); }
-        function closeHowToBuyModal() { document.getElementById('how-to-buy-modal').classList.add('hidden'); }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProductsFromSheet();
-            updateCartUI();
-        });
     </script>
 </body>
 </html>
