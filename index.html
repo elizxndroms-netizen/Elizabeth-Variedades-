@@ -430,8 +430,9 @@
                     return {
                         id: index + 1,
                         name: row["nombre del producto"] || row["Nombre del producto"] || "Producto sin nombre",
-                        category: (row["categoria principal"] || row["Categoría principal"] || "ropa").toLowerCase().trim(),
-                        subcategory: (row["subcategoria"] || row["Subcategoría"] || "general").toLowerCase().trim(),
+                       // CÓDIGO NUEVO ACTUALIZADO:
+                        category: (row["Categoría principal"] || row["categoria principal"] || row["Categoría"] || "").toString().toLowerCase().trim(),
+                        subcategory: (row["subcategoría"] || row["subcategoria"] || row["Subcategoría"] || "").toString().toLowerCase().trim(),
                         condition: (row["condicion"] || row["Condición"] || "nuevo").toLowerCase().trim(),
                         price: parseFloat(rawPrice.toString().replace(/[^0-9.]/g, '')) || 0,
                         oldPrice: parseFloat(rawOldPrice.toString().replace(/[^0-9.]/g, '')) || 0,
