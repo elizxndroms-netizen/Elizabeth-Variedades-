@@ -428,7 +428,7 @@
                         stock: (row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
                         image: imageArray[0].url,
                         images: imageArray,
-                        description: row["Descripción"] || row["descripcion"] || "Sin descripción disponible."
+                        description: row["Descripción"] || row["descripcion"] || row["DESCRIPCIÓN"] || row["Descripción del producto"] || "Sin descripción disponible."
                     };
                 });
 
