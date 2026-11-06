@@ -597,12 +597,16 @@
                     matchCat = prodCat === currCat;
                 }
 
-                let matchSub = true;
+               let matchSub = true;
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
-                    const prodSub = (p.subcategory || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const prodSub = (p.subcategory || "").toLowerCase();
                     const currSub = currentSubcategory.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    // Comprobación flexible (permite variaciones parciales como caballero / caballeros)
-                    matchSub = prodSub.includes(currSub) || currSub.includes(prodSub);
+                    
+                    // Divide las subcategorías por comas para permitir múltiples asignaciones (ej: "Dama, Caballero")
+                    const subListArray = prodSub.split(',').map(s => s.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+                    
+                    // Comprueba si la subcategoría actual coincide con alguna de las de la lista
+                    matchSub = subListArray.some(sub => sub.includes(currSub) || currSub.includes(sub));
                 }
 
                 return matchSearch && matchCat && matchSub;
