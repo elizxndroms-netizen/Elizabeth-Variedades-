@@ -428,16 +428,21 @@
                         }
                     }
 
-                    // Recolección de fotos
+             // Recolección de fotos de manera segura y ordenada
                     let imageArray = [];
+                    
+                    // Buscamos explícitamente todas las columnas que contengan la palabra "foto"
                     for (let key in row) {
                         if (key.toLowerCase().includes("foto") && row[key]) {
-                            let fixedUrl = fixDriveImageUrl(row[key]);
-                            if (fixedUrl) {
+                            let rawUrl = row[key].toString().trim();
+                            let fixedUrl = fixDriveImageUrl(rawUrl);
+                            
+                            if (fixedUrl && fixedUrl.startsWith("http")) {
                                 let labelName = "Foto";
                                 let lowerKey = key.toLowerCase();
+                                
                                 if (lowerKey.includes("real")) labelName = "Foto Real";
-                                else if (lowerKey.includes("referencia")) labelName = "Modelo";
+                                else if (lowerKey.includes("referencia") || lowerKey.includes("modelo")) labelName = "Modelo";
                                 else labelName = `Foto ${imageArray.length + 1}`;
 
                                 imageArray.push({ url: fixedUrl, type: labelName });
@@ -445,6 +450,7 @@
                         }
                     }
 
+                    // Si no encontró ninguna foto válida, ponemos una por defecto
                     if (imageArray.length === 0) {
                         imageArray.push({ url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&w=500&q=80", type: "Foto" });
                     }
