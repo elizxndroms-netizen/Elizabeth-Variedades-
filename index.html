@@ -346,7 +346,7 @@
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script>
-        const subcategoryConfig = {
+       const subcategoryConfig = {
             ropa: [
                 { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
                 { id: 'niños', label: 'Niños', icon: 'fa-solid fa-child' },
@@ -359,6 +359,7 @@
             zapatos: [
                 { id: 'todos_zapatos', label: 'Todo Zapatos', icon: 'fa-solid fa-shoe-prints' },
                 { id: 'niños', label: 'Niños', icon: 'fa-solid fa-child' },
+                { id: 'bebés', label: 'Bebés', icon: 'fa-solid fa-baby' }, 
                 { id: 'dama', label: 'Damas', icon: 'fa-solid fa-person-dress' },
                 { id: 'caballero', label: 'Caballeros', icon: 'fa-solid fa-user-tie' }
             ],
@@ -381,15 +382,17 @@
         let currentCategory = 'todos';
         let currentSubcategory = 'todos';
 
-        function fixDriveImageUrl(url) {
+      function fixDriveImageUrl(url) {
             if (!url) return '';
-            if (url.includes('drive.google.com')) {
-                const match = url.match(/[-\w]{25,}/);
-                if (match) return `https://lh3.googleusercontent.com/d/${match[0]}`;
+            // Extraemos el ID único del archivo de Google Drive
+            const match = url.match(/[-\w]{25,}/);
+            if (match) {
+                const fileId = match[0];
+                // Usamos el visor directo de Google que no es bloqueado por navegadores restrictivos
+                return `https://lh3.googleusercontent.com/d/${fileId}=s1000`;
             }
             return url;
         }
-
    async function loadProductsFromSheet() {
             const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
             try {
@@ -428,7 +431,7 @@
                         }
                     }
 
-             // Recolección de fotos de manera segura y ordenada
+            // Recolección de fotos de manera segura y ordenada
                     let imageArray = [];
                     
                     // Buscamos explícitamente todas las columnas que contengan la palabra "foto"
@@ -552,14 +555,17 @@
             }).join('');
         }
 
-        function filterCategory(cat) {
+     function filterCategory(cat) {
             currentCategory = cat.trim();
-            currentSubcategory = 'todos'; 
+            currentSubcategory = 'todos'; // Al cambiar de categoría, reseteamos la subcategoría a 'todos'
 
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap';
             });
-            event.target.className = 'cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm';
+            
+            if (event && event.target) {
+                event.target.className = 'cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm';
+            }
 
             const subContainer = document.getElementById('subcategory-container');
             const subList = document.getElementById('subcategory-list');
@@ -568,7 +574,7 @@
 
             if (subcategoryConfig[configKey]) {
                 subList.innerHTML = subcategoryConfig[configKey].map(sub => `
-                    <button onclick="filterSubcategory('${sub.label}')" class="subcat-btn text-xs px-3 py-1 rounded-full bg-white text-gray-600 border border-pink-200 hover:bg-pink-100 whitespace-nowrap flex items-center space-x-1">
+                    <button onclick="filterSubcategory('${sub.id}', '${sub.label}')" class="subcat-btn text-xs px-3 py-1 rounded-full bg-white text-gray-600 border border-pink-200 hover:bg-pink-100 whitespace-nowrap flex items-center space-x-1">
                         <i class="${sub.icon}"></i> <span>${sub.label}</span>
                     </button>
                 `).join('');
@@ -580,22 +586,27 @@
             applyFilters();
         }
 
-        function filterSubcategory(subLabel) {
-            currentSubcategory = subLabel.trim();
+        function filterSubcategory(subId, subLabel) {
+            // Si el ID empieza con "todos_", indicamos que muestre "todos"
+            if (subId.startsWith('todos_')) {
+                currentSubcategory = 'todos';
+            } else {
+                currentSubcategory = subLabel.trim();
+            }
             applyFilters();
         }
 
-       function applyFilters() {
+        function applyFilters() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
 
             let filtered = products.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search);
                 
-                // Limpiamos y normalizamos la categoría del producto y la actual
                 const prodCat = (p.category || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 const currCat = currentCategory.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+                // 1. Filtro por Categoría Principal
                 let matchCat = true;
                 if (currCat === 'ofertas') {
                     matchCat = p.oldPrice > p.price;
@@ -603,15 +614,13 @@
                     matchCat = prodCat === currCat;
                 }
 
-               let matchSub = true;
+                // 2. Filtro por Subcategoría (Si es 'todos' o empieza con 'todos_', se muestran TODAS las subcategorías)
+                let matchSub = true;
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
                     const prodSub = (p.subcategory || "").toLowerCase();
                     const currSub = currentSubcategory.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     
-                    // Divide las subcategorías por comas para permitir múltiples asignaciones (ej: "Dama, Caballero")
                     const subListArray = prodSub.split(',').map(s => s.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
-                    
-                    // Comprueba si la subcategoría actual coincide con alguna de las de la lista
                     matchSub = subListArray.some(sub => sub.includes(currSub) || currSub.includes(sub));
                 }
 
@@ -624,7 +633,6 @@
 
             renderProducts(filtered);
         }
-
         function openProductModal(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
