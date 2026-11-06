@@ -127,7 +127,7 @@
         </div>
     </aside>
 
-<!-- BARRA PRINCIPAL DE CATEGORÍAS -->
+    <!-- BARRA PRINCIPAL DE CATEGORÍAS (Actualizado con los nombres exactos del Form) -->
     <div class="bg-white shadow-sm border-b sticky top-[68px] z-20">
         <div class="max-w-7xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar">
             <button onclick="filterCategory('todos')" class="cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-pink-600 text-white whitespace-nowrap shadow-sm">Todos</button>
@@ -346,7 +346,7 @@
 
     <!-- LÓGICA DE JAVASCRIPT -->
     <script>
-      const subcategoryConfig = {
+        const subcategoryConfig = {
             ropa: [
                 { id: 'todos_ropa', label: 'Todo Ropa', icon: 'fa-solid fa-shirt' },
                 { id: 'niños', label: 'Niños', icon: 'fa-solid fa-child' },
@@ -370,6 +370,9 @@
                 { id: 'bolsas y mochilas', label: 'Bolsas y Mochilas', icon: 'fa-solid fa-bag-shopping' },
                 { id: 'tecnología', label: 'Tecnología', icon: 'fa-solid fa-mobile-screen' },
                 { id: 'belleza', label: 'Belleza', icon: 'fa-solid fa-wand-magic-sparkles' }
+            ],
+            "consolas & teléfonos": [
+                { id: 'todos_consolas', label: 'Todo Consolas & Teléfonos', icon: 'fa-solid fa-gamepad' }
             ]
         };
 
@@ -387,17 +390,36 @@
             return url;
         }
 
-            async function loadProductsFromSheet() {
+   async function loadProductsFromSheet() {
             const sheetAPIUrl = "https://script.google.com/macros/s/AKfycby3JAW7dTkbgLs0OngNT5aUUdrhqKV26lxOYFAHPg9KIwnU7nV1SaR0UPhIUgIBE_VC/exec";
             try {
                 const response = await fetch(sheetAPIUrl);
                 const data = await response.json();
 
                 products = data.map((row, index) => {
-                    const rawPrice = row["precio actual"] || row["Precio Actual"] || row["precio"] || "0";
-                    const rawOldPrice = row["precio anterior"] || row["Precio Anterior"] || "0";
+                    // Búsqueda inteligente de propiedades ignorando mayúsculas y acentos
+                    const getField = (keys) => {
+                        for (let k of keys) {
+                            for (let prop in row) {
+                                const cleanProp = prop.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                                const cleanKey = k.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                                if (cleanProp === cleanKey && row[prop] !== undefined && row[prop] !== "") {
+                                    return row[prop];
+                                }
+                            }
+                        }
+                        return "";
+                    };
 
-                    // Búsqueda inteligente de la descripción en cualquier columna que contenga "descrip"
+                    const rawName = getField(["nombre del producto", "nombre", "producto"]);
+                    const rawCategory = getField(["categoria principal", "categoría principal", "categoria", "categoría"]);
+                    const rawSubcategory = getField(["subcategoria", "subcategoría"]);
+                    const rawCondition = getField(["condicion", "condición"]);
+                    const rawPrice = getField(["precio actual", "precio"]);
+                    const rawOldPrice = getField(["precio anterior"]);
+                    const rawStock = getField(["stock", "existencias", "cantidad"]);
+
+                    // Búsqueda de descripción
                     let descText = "";
                     for (let key in row) {
                         if (key.toLowerCase().includes("descrip") && row[key]) {
@@ -429,19 +451,18 @@
 
                     return {
                         id: index + 1,
-                        name: row["nombre del producto"] || row["Nombre del producto"] || "Producto sin nombre",
-                       // CÓDIGO NUEVO ACTUALIZADO:
-                        category: (row["Categoría principal"] || row["categoria principal"] || row["Categoría"] || "").toString().toLowerCase().trim(),
-                        subcategory: (row["subcategoría"] || row["subcategoria"] || row["Subcategoría"] || "").toString().toLowerCase().trim(),
-                        condition: (row["condicion"] || row["Condición"] || "nuevo").toLowerCase().trim(),
+                        name: rawName || "Producto sin nombre",
+                        category: rawCategory.toString().trim(),
+                        subcategory: rawSubcategory.toString().trim(),
+                        condition: (rawCondition || "nuevo").toLowerCase().trim(),
                         price: parseFloat(rawPrice.toString().replace(/[^0-9.]/g, '')) || 0,
                         oldPrice: parseFloat(rawOldPrice.toString().replace(/[^0-9.]/g, '')) || 0,
-                        stock: (row["stock"] !== undefined && row["stock"] !== "" && !isNaN(parseInt(row["stock"]))) ? parseInt(row["stock"]) : 0,
+                        stock: (rawStock !== undefined && rawStock !== "" && !isNaN(parseInt(rawStock))) ? parseInt(rawStock) : 0,
                         image: imageArray[0].url,
                         images: imageArray,
                         description: descText || "Sin descripción disponible."
                     };
-                });
+                }).filter(p => p.name !== "Producto sin nombre"); // Ignorar filas vacías
 
                 applyFilters();
                 updateCartUI();
@@ -524,9 +545,10 @@
                     </div>`;
             }).join('');
         }
-function filterCategory(cat) {
-            currentCategory = cat;
-            currentSubcategory = 'todos'; // Resetea a todos para que no oculte los productos
+
+        function filterCategory(cat) {
+            currentCategory = cat.trim();
+            currentSubcategory = 'todos'; 
 
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap';
@@ -536,9 +558,11 @@ function filterCategory(cat) {
             const subContainer = document.getElementById('subcategory-container');
             const subList = document.getElementById('subcategory-list');
 
-            if (subcategoryConfig[cat]) {
-                subList.innerHTML = subcategoryConfig[cat].map(sub => `
-                    <button onclick="filterSubcategory('${sub.id}')" class="subcat-btn text-xs px-3 py-1 rounded-full bg-white text-gray-600 border border-pink-200 hover:bg-pink-100 whitespace-nowrap flex items-center space-x-1">
+            const configKey = cat.toLowerCase().trim();
+
+            if (subcategoryConfig[configKey]) {
+                subList.innerHTML = subcategoryConfig[configKey].map(sub => `
+                    <button onclick="filterSubcategory('${sub.label}')" class="subcat-btn text-xs px-3 py-1 rounded-full bg-white text-gray-600 border border-pink-200 hover:bg-pink-100 whitespace-nowrap flex items-center space-x-1">
                         <i class="${sub.icon}"></i> <span>${sub.label}</span>
                     </button>
                 `).join('');
@@ -549,28 +573,36 @@ function filterCategory(cat) {
 
             applyFilters();
         }
-        function filterSubcategory(subId) {
-            currentSubcategory = subId;
+
+        function filterSubcategory(subLabel) {
+            currentSubcategory = subLabel.trim();
             applyFilters();
         }
-function applyFilters() {
+
+       function applyFilters() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
 
             let filtered = products.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search);
                 
+                // Limpiamos y normalizamos la categoría del producto y la actual
+                const prodCat = (p.category || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const currCat = currentCategory.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
                 let matchCat = true;
-                if (currentCategory === 'ofertas') {
+                if (currCat === 'ofertas') {
                     matchCat = p.oldPrice > p.price;
-                } else if (currentCategory !== 'todos') {
-                    // Compara ignorando diferencias de mayúsculas y acentos básicos
-                    matchCat = p.category.trim().toLowerCase() === currentCategory.trim().toLowerCase();
+                } else if (currCat !== 'todos') {
+                    matchCat = prodCat === currCat;
                 }
 
                 let matchSub = true;
                 if (currentSubcategory !== 'todos' && !currentSubcategory.startsWith('todos_')) {
-                    matchSub = p.subcategory.trim().toLowerCase() === currentSubcategory.trim().toLowerCase();
+                    const prodSub = (p.subcategory || "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const currSub = currentSubcategory.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    // Comprobación flexible (permite variaciones parciales como caballero / caballeros)
+                    matchSub = prodSub.includes(currSub) || currSub.includes(prodSub);
                 }
 
                 return matchSearch && matchCat && matchSub;
@@ -582,6 +614,7 @@ function applyFilters() {
 
             renderProducts(filtered);
         }
+
         function openProductModal(id) {
             const p = products.find(prod => prod.id === id);
             if (!p) return;
